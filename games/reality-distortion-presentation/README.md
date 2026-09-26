@@ -2,7 +2,7 @@
 
 スティーブ・ジョブズのプレゼン像を誇張した、約90秒の非公式パロディゲームです。レンガを「革命的な新製品」として発表します。
 
-[ブラウザですぐ遊ぶ](https://mechanohime.com/play/reality-field/)
+[ブラウザですぐ遊ぶ](https://donmecha.github.io/kusoge-arcade/games/reality-distortion-presentation/)
 
 `index.html` をブラウザで開けばローカルでも遊べます。依存パッケージやビルドは不要です。
 

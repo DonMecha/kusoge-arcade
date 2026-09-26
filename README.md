@@ -1,15 +1,11 @@
 # クソゲーアーケード
 
-わたしが作った短編ブラウザゲームを並べるシリーズリポジトリです。各ゲームはブラウザで手軽に遊べます。
+わたしが作った短編ブラウザゲームを並べるシリーズリポジトリです。
 
-| ゲーム | 内容 | プレイ |
-| --- | --- | --- |
-| [現実歪曲プレゼン](games/reality-distortion-presentation/) | レンガを「革命的な新製品」として発表する、約90秒の非公式パロディゲーム | [すぐ遊ぶ](https://mechanohime.com/play/reality-field/) |
+| ゲーム | プレイ |
+| --- | --- |
+| [現実歪曲プレゼン](games/reality-distortion-presentation/) | [すぐ遊ぶ](https://donmecha.github.io/kusoge-arcade/games/reality-distortion-presentation/) |
+| [PafuPafu RPG 第1章「月灯りの宿」](games/pafupafu-rpg/) | [すぐ遊ぶ](https://donmecha.github.io/kusoge-arcade/games/pafupafu-rpg/) |
 
-## ローカルで遊ぶ
-
-各ゲームの `index.html` をブラウザで開いてください。現実歪曲プレゼンは依存パッケージやビルドが不要です。
-
-公開版は [mechanohime.com](https://mechanohime.com/play/reality-field/) で遊べます。今後のゲームは `games/` に追加します。
-
-各作品に表示される注意書きも参照してください。現実歪曲プレゼンは非公式のフィクション・パロディで、Appleおよび関係者との提携・承認はありません。AIを用いて制作しています。
+GitHub Pagesで公開しています。各作品の説明と注意書きは作品内をご覧ください。
+PafuPafu RPGの記録は端末とブラウザごとに保存されます。別URLから移る場合は旧URLでJSONを書き出し、新URLで読み込んでください。

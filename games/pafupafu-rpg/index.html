@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#10121f">
+  <meta name="description" content="PafuPafu RPG 第1章先行公開版。宿で消えた客を追い、会話・探索・謎解き・戦闘で事件を解決するブラウザRPG。第2章以降は後日公開予定。">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ja_JP">
+  <meta property="og:site_name" content="PafuPafu RPG">
+  <meta property="og:title" content="PafuPafu RPG｜第1章 月灯りの宿">
+  <meta property="og:description" content="宿で消えた客を追い、会話・探索・謎解き・戦闘で事件を解決するブラウザRPG。第1章を公開中。第2章以降は後日公開予定。">
+  <link rel="canonical" href="https://donmecha.github.io/kusoge-arcade/games/pafupafu-rpg/">
+  <meta property="og:url" content="https://donmecha.github.io/kusoge-arcade/games/pafupafu-rpg/">
+  <meta property="og:image" content="https://donmecha.github.io/kusoge-arcade/games/pafupafu-rpg/ogp-20260926.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1734">
+  <meta property="og:image:height" content="907">
+  <meta property="og:image:alt" content="PafuPafu RPG 第1章 月灯りの宿の共有画像">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PafuPafu RPG｜第1章 月灯りの宿">
+  <meta name="twitter:description" content="宿で消えた客を追う、会話・探索・謎解き・戦闘のブラウザRPG。第1章公開中。">
+  <meta name="twitter:image" content="https://donmecha.github.io/kusoge-arcade/games/pafupafu-rpg/ogp-20260926.png">
+  <meta name="twitter:image:alt" content="PafuPafu RPG 第1章 月灯りの宿の共有画像">
+  <title>PafuPafu RPG — 第1章 先行公開版</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2310121f'/%3E%3Cpath d='M22 5A12 12 0 1 0 27 22 10 10 0 0 1 22 5Z' fill='%23dfb86d'/%3E%3C/svg%3E">
+  <link rel="preload" href="assets/fonts/DotGothic16-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="style.css?v=0.3.0">
+  <link rel="stylesheet" href="retro.css?v=0.3.0">
+  <link rel="stylesheet" href="play-ui.css?v=0.3.0">
+  <link rel="stylesheet" href="release.css?v=0.3.0">
+</head>
+<body>
+<main id="app">
+  <header class="masthead"><a class="brand" href="#" id="brand" aria-label="ゲームを一時停止"><span class="moon-mark" aria-hidden="true">☾</span><span>PafuPafu RPG</span></a><span class="edition">第一章 <i></i> 月灯りの宿</span><div id="hud" class="hud hidden"><div class="player-status"><div><strong>主人公</strong><div id="hearts" class="hearts" aria-label="体力"></div></div></div><div id="boss-hud" class="boss-hud hidden"><span>眠りの番人</span><div><i></i></div></div><div class="hud-actions"><button id="quick-potion" class="quick-potion" title="回復薬を使う (Q)"><span class="potion-label">薬</span><kbd>Q</kbd><span class="potion-stock">×<span id="potion-count">0</span></span></button><button id="journal" title="旅の手帳 (Tab)">手帳 <b id="journal-dot" class="hidden">!</b></button><button id="save" title="中断セーブ">保存</button></div></div><div class="header-actions"><button id="sound" class="icon-button" aria-label="音を有効にする" title="音を有効にする" aria-pressed="false"><svg class="control-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6h3V4h2V2h2v12H7v-2H5v-2H2z"/><path class="sound-waves" d="M11 5h1v1h1v4h-1v1h-1zM13 2h1v2h1v8h-1v2h-1v-3h1V5h-1z"/></svg><span class="sound-off" aria-hidden="true"></span></button><button id="help" class="icon-button" aria-label="操作方法" title="操作方法"><svg class="control-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2h8v2h2v4h-2v2H9v2H7V8h3V6h2V4H4v2H2V4h2zM7 14h2v2H7z"/></svg></button><button id="pause" class="icon-button" aria-label="メニューを開く" title="メニュー (Esc)"><svg class="control-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2h4v12H3zM10 2h4v12h-4z"/></svg></button></div></header>
+  <div class="stage-wrap">
+    <div class="playfield">
+    <section id="stage" class="stage" aria-label="ゲーム画面">
+      <canvas id="game" width="960" height="600" tabindex="0" aria-label="探索画面。矢印キーで移動、Eで調べる、Jで攻撃、Kで回避、Qで薬。"></canvas>
+      <div class="vignette"></div>
+      <div id="travel-cue" class="travel-cue hidden" aria-hidden="true"></div>
+      <div id="title" class="title-screen">
+        <div class="title-art"></div><div class="title-shade"></div><div class="title-dust"></div>
+        <div class="title-content"><p class="release-tag">第一章 先行公開版</p><h1>PafuPafu<span>RPG</span></h1><p class="chapter-title">第一章 <span>月灯りの宿</span></p><div class="title-buttons"><button id="new-game" class="primary-button" disabled><span>はじめから</span><small>Enter</small></button><button id="continue-game" class="secondary-button hidden">つづきから <span id="continue-label"></span></button></div></div>
+        <div class="title-bottom"><button id="title-info" class="title-info">この公開版について</button><span id="load-status">旅の支度をしています…</span></div>
+      </div>
+      <div id="event-scene" class="event-scene hidden"><img src="assets/tavern-event.png" alt="暖かな宿屋のカウンターに立つ店員ミラ"><div></div></div>
+      <div id="dialogue" class="dialogue hidden" role="dialog" aria-label="会話"><div id="speaker" class="speaker"></div><div id="dialogue-text" class="dialogue-text"></div><div id="choices" class="choices"></div><button id="advance" class="advance" aria-label="次の会話">つづける <span>▾</span></button></div>
+      <div id="modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="modal-panel"><button id="modal-close" class="modal-close" aria-label="閉じる">×</button><p id="modal-eyebrow" class="eyebrow"></p><h2 id="modal-title"></h2><div id="modal-body"></div></div></div>
+      <div id="chapter-card" class="chapter-card hidden"><p></p><h2></h2><span></span></div>
+    </section>
+    <div id="touch-controls" class="touch-controls hidden"><div id="joystick" class="joystick" aria-label="移動スティック"><span></span></div><div class="touch-actions"><button id="touch-potion" aria-label="回復薬を使う">薬</button><button id="touch-dodge" aria-label="回避">回避</button><button id="touch-attack" aria-label="攻撃">攻撃</button><button id="touch-interact" aria-label="調べる">調べる</button></div></div>
+    </div>
+  </div>
+  <footer class="game-footer"><div id="area" class="area hidden"><span id="area-name"></span><span id="area-subtitle"></span></div><div class="context-line"><div id="objective" class="objective hidden"><span class="objective-gem">◆</span><span id="objective-text"></span></div><div id="interact-hint" class="interact-hint hidden"><kbd>E</kbd><span></span></div><div id="toast" class="toast hidden" role="status" aria-live="polite"></div></div><span class="footer-location"><i></i><span id="footer-location">月灯りの宿</span></span><div class="keyboard-guide"><span><kbd>WASD</kbd> 移動</span><span><kbd>E</kbd> 調べる</span><span><kbd>J</kbd> 攻撃</span><span><kbd>K</kbd> 回避</span><span><kbd>Q</kbd> 薬</span><span><kbd>Tab</kbd> 手帳</span></div><span class="footer-version">v0.3.0</span></footer>
+</main>
+<input type="file" id="import-save" accept=".json,application/json" class="hidden">
+<script type="module" src="game.mjs?v=0.3.0"></script>
+</body></html>
