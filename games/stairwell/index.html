@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0c0c">
+<title>非常階段 — 会場まで、あと一枚の扉。</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0b0c0c;--card:#131615;--card-2:#191c1b;--well:#0d0f0e;
+  --line:rgba(236,234,228,.08);--line-2:rgba(236,234,228,.15);
+  --text:#ecebe6;--body:#c4c7c1;--muted:#8b908b;--dim:#5c615d;
+  --exit:#25c97c;--exit-hi:#5cf0a8;--exit-ink:#03170c;--exit-wash:rgba(37,201,124,.1);--exit-edge:rgba(37,201,124,.42);
+  --caution:#f3c316;--red:#ff6a4d;--warm:#ffd27a;
+  --display:"Dela Gothic One","Hiragino Sans","Yu Gothic",sans-serif;
+  --sans:"Zen Kaku Gothic New","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;
+  --cond:"Barlow Condensed","Arial Narrow","Hiragino Sans",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Zen Kaku Gothic New","Hiragino Sans",monospace;
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;min-height:100vh;background:radial-gradient(1100px 520px at 78% -8%,rgba(37,201,124,.075),transparent 62%),radial-gradient(900px 600px at -10% 110%,rgba(243,195,22,.035),transparent 60%),var(--bg);color:var(--text);font:400 14px/1.75 var(--sans);-webkit-font-smoothing:antialiased;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:100;opacity:.05;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:disabled{opacity:.32;cursor:default}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--exit-hi);outline-offset:3px}
+a{color:var(--exit-hi)}
+[hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* ---------- shell ---------- */
+.app{max-width:1320px;margin:0 auto;padding:0 40px}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:22px 0;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:var(--exit);color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.12) inset,0 6px 22px -6px rgba(37,201,124,.7)}
+.brand-text{font:700 15px/1.1 var(--cond);letter-spacing:.2em}
+.brand-text small{display:block;font:500 10.5px var(--sans);letter-spacing:.12em;color:var(--muted);margin-top:3px}
+.head-actions{display:flex;align-items:center;gap:8px}
+.quiet{min-height:36px;padding:6px 15px;border-radius:999px;border:1px solid var(--line-2);background:rgba(255,255,255,.02);color:var(--muted);font-size:12.5px;font-weight:500;transition:color .2s,border-color .2s,background .2s}
+.quiet:hover{color:var(--text);border-color:rgba(236,234,228,.3);background:rgba(255,255,255,.04)}
+#sound[aria-pressed="true"]{color:var(--exit-hi);border-color:var(--exit-edge);background:var(--exit-wash)}
+
+.mast{display:flex;justify-content:space-between;align-items:flex-end;gap:32px;padding:40px 0 30px}
+.eyebrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;font:600 12px var(--cond);letter-spacing:.2em;color:var(--muted);margin-bottom:14px}
+.live{display:inline-flex;align-items:center;gap:8px;color:var(--exit-hi)}
+.live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--exit);box-shadow:0 0 10px var(--exit)}
+h1{font:400 clamp(48px,6.6vw,92px)/1.02 var(--display);letter-spacing:.06em;margin:0}
+.subtitle{margin:14px 0 0;color:var(--body);font-size:16px;letter-spacing:.08em}
+.goal{flex:none}
+.overline{display:block;font:600 11px var(--cond);letter-spacing:.22em;color:var(--muted);margin-bottom:10px}
+.goal-plate{display:flex;align-items:stretch;border-radius:12px;overflow:hidden;border:1px solid var(--line-2);background:var(--card)}
+.goal-floor{display:flex;align-items:baseline;justify-content:center;gap:1px;min-width:78px;padding:10px 14px 6px;background:var(--exit);color:var(--exit-ink);font:800 44px/1 var(--cond)}
+.goal-floor small{font-size:20px}
+.goal-name{display:flex;flex-direction:column;justify-content:center;padding:10px 20px 10px 16px}
+.goal-name strong{font-size:17px;font-weight:700;letter-spacing:.04em;line-height:1.35}
+.goal-name small{font:600 11.5px var(--cond);letter-spacing:.16em;color:var(--muted)}
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:28px;align-items:start}
+
+/* ---------- countdown ---------- */
+.countdown{position:relative;display:flex;justify-content:space-between;align-items:center;gap:16px;margin:0 0 14px;padding:14px 22px 16px;border-radius:14px;border:1px solid var(--line);background:var(--card);overflow:hidden;transition:border-color .4s}
+.countdown-label{display:flex;flex-direction:column;font-size:13px;font-weight:500;color:var(--body);line-height:1.4}
+.countdown-label small{font:600 11px var(--cond);letter-spacing:.2em;color:var(--muted);margin-top:3px}
+.countdown time{font:700 42px/1 var(--cond);font-variant-numeric:tabular-nums;letter-spacing:.04em;color:var(--exit-hi);text-shadow:0 0 22px rgba(92,240,168,.35)}
+.cd-bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.04)}
+.cd-bar i{display:block;height:100%;background:var(--exit);transform-origin:left;transition:transform .3s linear,background .4s}
+.countdown.urgent{border-color:rgba(243,195,22,.55)}
+.countdown.urgent time{color:var(--caution);text-shadow:0 0 22px rgba(243,195,22,.4)}
+.countdown.urgent .countdown-label{color:var(--caution)}
+.countdown.urgent .cd-bar{height:5px}
+.countdown.urgent .cd-bar i{background:repeating-linear-gradient(-45deg,var(--caution) 0 8px,#1b1702 8px 16px)}
+.countdown.cleared time{font-size:24px;letter-spacing:.2em}
+
+/* ---------- scene ---------- */
+.scene-shell{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line-2);background:#0e100f;box-shadow:0 40px 80px -40px rgba(0,0,0,.9);transition:box-shadow 1.2s}
+.scene{position:relative;aspect-ratio:900/550;isolation:isolate}
+.architecture{display:block;width:100%;height:100%}
+.scene::before{content:"";position:absolute;inset:0 0 auto;height:26%;z-index:1;pointer-events:none;background:linear-gradient(rgba(8,10,9,.78),transparent)}
+.scene::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 75% 70% at 52% 42%,transparent 55%,rgba(5,7,6,.6) 100%)}
+.scene-top{position:absolute;left:22px;top:18px;right:22px;z-index:2;font:600 12px var(--cond);letter-spacing:.22em;color:#e8ece6}
+.scene-top small{display:block;font:500 13px var(--sans);letter-spacing:.06em;color:#b9c0ba;margin-top:4px}
+.tube-glow{animation:flicker 9s infinite}
+.term-screen{fill:#202826;transition:fill .6s}
+.term-text{fill:#3d4744}
+.term-halo{opacity:0;transition:opacity .6s}
+#svg-terminal.on .term-screen{fill:#2bd483;filter:url(#f-glow)}
+#svg-terminal.on .term-text{fill:#03170c}
+#svg-terminal.on .term-halo{opacity:1}
+
+.spot{position:absolute;z-index:3;transform:translate(-50%,-50%);display:inline-flex;align-items:center;gap:9px;min-height:36px;padding:6px 15px 6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(9,11,10,.74);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#f3f2ec;font-size:12.5px;font-weight:500;letter-spacing:.04em;white-space:nowrap;box-shadow:0 10px 30px -10px rgba(0,0,0,.8);transition:background .2s,border-color .2s,transform .25s var(--ease)}
+.spot::before{content:"";flex:none;width:9px;height:9px;border-radius:50%;background:var(--exit-hi);animation:ping 2.2s infinite}
+.spot:hover{background:rgba(14,40,27,.86);border-color:var(--exit-edge);transform:translate(-50%,-50%) translateY(-2px)}
+.detail{left:32.6%;top:53%}
+.door{left:52.2%;top:66%}
+.panel{left:67%;top:35.5%}
+.elevator{left:84.9%;top:55%}
+.scene-caption{display:flex;align-items:center;gap:12px;padding:14px 22px;border-top:1px solid var(--line);background:#111413;font-size:13px;color:var(--body)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--exit);box-shadow:0 0 10px var(--exit);flex:none}
+
+.floor-nav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:16px 0}
+.floor-nav #down{justify-self:start}.floor-nav #up{justify-self:end}
+.nav-button{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:10px 20px;border-radius:12px;border:1px solid var(--line-2);background:var(--card);font-weight:500;transition:border-color .2s,background .2s}
+.nav-button:hover:not(:disabled){border-color:var(--exit-edge);background:#152019}
+.arr{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.06);font:600 14px var(--cond)}
+.floor-line{display:flex;align-items:baseline;gap:10px;font:600 12px var(--cond);letter-spacing:.2em;color:var(--muted)}
+.floor-line b{font:800 34px/1 var(--cond);letter-spacing:0;color:var(--text)}
+
+.story{position:relative;padding:18px 22px 20px 26px;border-radius:14px;background:var(--card);border:1px solid var(--line);min-height:96px}
+.story::before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:3px;border-radius:0 3px 3px 0;background:var(--exit)}
+.story .label{display:block;font:600 12px var(--cond);letter-spacing:.18em;color:var(--exit-hi);margin-bottom:6px}
+.story p{margin:0;color:var(--body);font-size:15px;line-height:1.85}
+
+/* ---------- sidebar ---------- */
+.sidebar{display:flex;flex-direction:column;gap:14px}
+.card{padding:18px;border-radius:16px;background:var(--card);border:1px solid var(--line)}
+.aside-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.aside-title h2{margin:0;font-size:13px;font-weight:700;letter-spacing:.08em}
+.count{font:600 12px var(--cond);letter-spacing:.14em;color:var(--muted)}
+.map{display:flex;flex-direction:column;gap:6px}
+.floor-row{display:grid;grid-template-columns:50px 1fr auto;align-items:center;gap:12px;padding:6px 12px 6px 6px;border-radius:11px;border:1px solid transparent;background:var(--card-2);color:var(--muted);transition:background .3s,border-color .3s}
+.floor-row .number{display:flex;align-items:center;justify-content:center;height:36px;border-radius:8px;background:var(--well);color:var(--dim);font:700 21px/1 var(--cond)}
+.floor-row .number small{font-size:12px;margin:5px 0 0 1px}
+.floor-row.seen .number{color:var(--body)}
+.floor-row .where{font-size:12.5px}
+.floor-row .visited{font:600 11px var(--cond);letter-spacing:.16em;color:var(--dim)}
+.floor-row.goal .visited{color:var(--caution)}
+.floor-row.active{background:var(--exit-wash);border-color:var(--exit-edge);color:var(--text)}
+.floor-row.active .number{background:var(--exit);color:var(--exit-ink);box-shadow:0 0 18px -4px rgba(37,201,124,.8)}
+.floor-row.active .visited{color:var(--exit-hi)}
+.items{display:flex;flex-direction:column;gap:8px}
+.item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:8px 12px 8px 8px;border-radius:12px;border:1px solid var(--line);background:var(--card-2);font-size:13px;font-weight:500;line-height:1.45;transition:border-color .2s,background .2s}
+.item:hover{border-color:var(--exit-edge);background:#17201b}
+.item-icon{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:9px;background:var(--well);color:var(--exit-hi);font-size:19px}
+.item small{display:block;margin-top:2px;font-size:11.5px;font-weight:400;color:var(--muted)}
+.tasks{list-style:none;margin:0;padding:0;display:grid;gap:11px;font-size:13px;color:var(--muted)}
+.tasks li{display:flex;gap:11px;align-items:flex-start;line-height:1.5}
+.tasks li::before{content:"";flex:none;width:17px;height:17px;margin-top:1px;border-radius:50%;border:1.5px solid var(--line-2)}
+.tasks li.done{color:var(--text)}
+.tasks li.done::before{border-color:var(--exit);background:var(--exit) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.6 6.3l2.2 2.2 4.6-5' fill='none' stroke='%2303170c' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/11px no-repeat}
+.help{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px;border-radius:14px;border:1px dashed rgba(236,234,228,.22);background:transparent;color:var(--muted);font-weight:500;transition:color .2s,border-color .2s,background .2s}
+.help:hover{color:var(--caution);border-color:rgba(243,195,22,.5);background:rgba(243,195,22,.04)}
+
+footer{display:flex;justify-content:space-between;gap:14px;margin-top:44px;padding:22px 0 30px;border-top:1px solid var(--line);color:var(--dim);font-size:12px}
+footer a{color:var(--muted);text-decoration:none}footer a:hover{color:var(--exit-hi)}
+
+.win .scene-shell{box-shadow:0 0 0 1px rgba(255,210,122,.35),0 40px 120px -30px rgba(255,200,110,.38)}
+.win .scene-caption{color:var(--warm)}
+.win .dot{background:var(--warm);box-shadow:0 0 10px var(--warm)}
+.win .live{color:var(--warm)}.win .live::before{background:var(--warm);box-shadow:0 0 10px var(--warm)}
+
+/* ---------- dialog ---------- */
+dialog{padding:0;width:min(560px,calc(100% - 32px));max-height:calc(100dvh - 40px);border:1px solid var(--line-2);border-radius:20px;background:linear-gradient(180deg,#181c1a,#111413 60%);color:var(--text);box-shadow:0 40px 120px rgba(0,0,0,.65);overflow:auto;overscroll-behavior:contain}
+dialog[open]{animation:pop .32s var(--ease)}
+dialog::backdrop{background:rgba(4,6,5,.74);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.modal-head{position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:12px;padding:14px 16px 14px 26px;border-bottom:1px solid var(--line);background:rgba(22,26,24,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.modal-head span{flex:1;min-width:0;font:600 12px var(--cond);letter-spacing:.18em;color:var(--exit-hi);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.modal-timer{font:700 14px var(--cond);font-variant-numeric:tabular-nums;letter-spacing:.08em;color:var(--body)}
+.modal-timer:not(:empty){padding:3px 11px;border-radius:999px;background:var(--well);border:1px solid var(--line)}
+.close{flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;border:1px solid var(--line-2);background:transparent;color:var(--muted);transition:color .2s,border-color .2s}
+.close:hover:not(:disabled){color:var(--text);border-color:rgba(236,234,228,.35)}
+.modal-body{padding:28px 28px 30px}
+.modal-body h2{margin:0 0 16px;font:700 27px/1.45 var(--sans);letter-spacing:.04em}
+.modal-body p{margin:0 0 14px;color:var(--body);font-size:14.5px;line-height:1.9}
+.modal-body strong{color:var(--text)}
+.evidence{position:relative;margin:18px 0;padding:18px 20px 18px 24px;border-radius:12px;background:var(--well);border:1px solid var(--line);font:500 14.5px/1.95 var(--mono);color:#dff2e7;white-space:pre-line}
+.evidence::before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:3px;border-radius:0 3px 3px 0;background:var(--exit)}
+.primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:12px 24px;border:0;border-radius:12px;background:var(--exit);color:var(--exit-ink);font:700 14.5px var(--sans);letter-spacing:.04em;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 10px 30px -10px rgba(37,201,124,.7);transition:background .2s,transform .2s var(--ease)}
+.primary:hover{background:var(--exit-hi);transform:translateY(-1px)}
+.modal-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.modal-actions .quiet{min-height:50px;border-radius:12px;padding:10px 18px}
+.input-label{display:block;margin:20px 0 8px;font:600 12px var(--cond);letter-spacing:.18em;color:var(--muted)}
+.pin{width:100%;padding:14px 18px;border-radius:14px;border:1px solid var(--exit-edge);background:#06100b;color:var(--exit-hi);font:700 44px/1 var(--cond);letter-spacing:.7em;text-indent:.7em;text-align:center;text-shadow:0 0 14px rgba(92,240,168,.55);box-shadow:inset 0 0 40px rgba(37,201,124,.08)}
+.error{min-height:24px;margin:10px 0!important;font-size:13px!important;color:var(--red)!important}
+.bell-display{min-height:74px;display:grid;place-items:center;padding:16px;border-radius:14px;border:1px solid var(--exit-edge);background:#06100b;color:var(--exit-hi);font:700 28px var(--mono);letter-spacing:.45em;text-indent:.45em;text-shadow:0 0 14px rgba(92,240,168,.55);box-shadow:inset 0 0 40px rgba(37,201,124,.08)}
+.bells{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.bells .nav-button{min-height:64px;font-size:15px}
+.answer-list{display:grid;gap:10px;margin-top:20px}
+.answer-list button{display:flex;align-items:center;gap:14px;padding:15px 18px;border-radius:12px;border:1px solid var(--line-2);background:var(--card);text-align:left;font-weight:500;transition:border-color .2s,background .2s}
+.answer-list button::before{content:"";flex:none;width:17px;height:17px;border-radius:50%;border:1.5px solid var(--line-2);transition:all .2s}
+.answer-list button:hover{border-color:var(--exit-edge);background:#152019}
+.answer-list button:hover::before{border-color:var(--exit);background:var(--exit);box-shadow:inset 0 0 0 3px #152019}
+.note-list{display:grid;gap:4px}
+.note-list article{padding:14px 0;border-bottom:1px solid var(--line)}
+.note-list article:last-child{border-bottom:0}
+.note-list h3{margin:0 0 6px;font:600 12.5px var(--cond);letter-spacing:.16em;color:var(--exit-hi)}
+.note-list p{margin:0!important;font-size:13.5px!important}
+.hero-label{display:inline-flex;align-items:center;gap:10px;margin-bottom:14px;font:600 12px var(--cond);letter-spacing:.22em;color:var(--exit-hi)}
+.hero-label::before{content:"";width:22px;height:1px;background:currentColor}
+.intro-card{margin:22px 0;padding:16px 18px;border-radius:12px;background:rgba(255,255,255,.025);border:1px solid var(--line);color:var(--muted);font-size:13px;line-height:1.85}
+.intro-card strong{display:block;margin-bottom:4px;font:600 12px var(--cond);letter-spacing:.2em;color:var(--text)}
+.source-note{font-size:11.5px!important;color:var(--dim)!important}
+.ending-number{margin:6px 0 18px;font:800 96px/1 var(--cond);color:var(--warm);text-shadow:0 0 40px rgba(255,210,122,.35)}
+.time-note{font:600 13px var(--cond)!important;letter-spacing:.14em;color:var(--exit-hi)!important}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.stats span{padding:12px 14px;border-radius:12px;background:var(--well);border:1px solid var(--line);color:var(--muted);font-size:11.5px}
+.stats b{display:block;margin-top:2px;font:700 24px/1.2 var(--cond);color:var(--text)}
+.scan-light{color:var(--exit-hi)!important}
+
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(92,240,168,.6)}80%,100%{box-shadow:0 0 0 9px rgba(92,240,168,0)}}
+@keyframes flicker{0%,90%,100%{opacity:1}91%{opacity:.45}92%{opacity:1}94%{opacity:.7}95%{opacity:1}}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}}
+@media(prefers-reduced-motion:reduce){.tube-glow,.spot::before,dialog[open]{animation:none}*{transition:none!important}}
+
+/* ---------- responsive ---------- */
+@media(max-width:1060px){.app{padding:0 24px}.layout{grid-template-columns:minmax(0,1fr) 270px;gap:20px}.spot{font-size:11.5px;padding:5px 12px 5px 9px;min-height:32px}.goal-floor{min-width:64px;font-size:36px}}
+@media(max-width:780px){
+  .app{padding:0 16px}
+  header{padding:16px 0}
+  .brand{min-width:0}.brand-text{font-size:13px;letter-spacing:.14em;white-space:nowrap}
+  .brand-mark{width:30px;height:30px}
+  .brand-text small{display:none}
+  .head-actions{gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .quiet{padding:4px 10px;min-height:34px;font-size:11.5px}
+  .mast{display:block;padding:28px 0 22px}
+  h1{font-size:56px}
+  .subtitle{font-size:14px}
+  .goal{margin-top:20px}
+  .layout{grid-template-columns:minmax(0,1fr);gap:16px}
+  .layout>*{min-width:0}
+  .countdown{padding:12px 16px 14px}.countdown time{font-size:34px}
+  .scene{aspect-ratio:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 10px 10px}
+  .architecture{grid-row:2;grid-column:1/-1;aspect-ratio:1.6;height:auto;margin:0 -10px;width:calc(100% + 20px)}
+  .scene::before{display:none}
+  .scene::after{display:none}
+  .scene-top{position:static;grid-row:1;grid-column:1/-1;padding:14px 4px 4px}
+  .scene-top small{font-size:12px}
+  .spot{position:relative;left:auto;top:auto;transform:none;justify-content:flex-start;min-height:46px;border-radius:12px;background:var(--card-2);border-color:var(--line-2);box-shadow:none;white-space:normal;text-align:left}
+  .spot:hover{transform:none}
+  .door{grid-row:3;grid-column:1}.elevator{grid-row:3;grid-column:2}.detail{grid-row:4;grid-column:1}.panel{grid-row:4;grid-column:2}
+  .scene-caption{padding:12px 16px;font-size:12.5px}
+  .nav-button{padding:9px 12px;font-size:13px}
+  .floor-line{gap:6px;font-size:10px;letter-spacing:.12em}.floor-line b{font-size:28px}
+  .story{padding:16px 18px 18px 22px}.story p{font-size:14px}
+  .map{flex-direction:row;gap:5px}
+  .floor-row{flex:1 1 0;min-width:0;grid-template-columns:minmax(0,1fr);justify-items:center;gap:4px;padding:6px 4px 8px;text-align:center}
+  .floor-row .number{width:100%;height:32px;font-size:18px}
+  .floor-row .where{font-size:10px;line-height:1.3}
+  .floor-row .visited{font-size:9.5px;letter-spacing:.08em}
+  footer{display:block}footer span{display:block;margin-bottom:8px}
+  .modal-head{padding:12px 12px 12px 20px}
+  .modal-body{padding:22px 20px 24px}.modal-body h2{font-size:23px}
+  .pin{font-size:36px}
+  .ending-number{font-size:72px}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+<header>
+  <div class="brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3.5h5.5v17H13"/><path d="M4 12h10.5"/><path d="M10.5 8l4 4-4 4"/></svg></span><span class="brand-text">THE WRONG DOOR<small>非常階段からの脱出</small></span></div>
+  <div class="head-actions"><button class="quiet" id="sound" aria-pressed="false">音 OFF</button><button class="quiet" id="notes">探索メモ</button><button class="quiet" id="restart">やり直す</button></div>
+</header>
+<div class="mast">
+  <div><div class="eyebrow"><span>ESCAPE GAME · 2026.10.04</span><span class="live" id="session-label">IN THE STAIRWELL</span></div><h1>非常階段</h1><p class="subtitle">会場まで、あと一枚の扉。</p></div>
+  <div class="goal"><span class="overline">YOUR DESTINATION</span><div class="goal-plate"><span class="goal-floor">17<small>F</small></span><span class="goal-name"><strong>AIDDもくもく会</strong><small>TOKYO #7 · 13:00 START</small></span></div></div>
+</div>
+<main class="layout">
+<section aria-label="階段の探索">
+  <div class="countdown" id="countdown"><span class="countdown-label" id="countdown-label">開演まで<small>MAKE IT BEFORE 13:00</small></span><time id="remaining" role="timer" aria-label="残り時間">10:00</time><div class="cd-bar" aria-hidden="true"><i id="cd-fill"></i></div></div><span class="sr-only" id="time-warning" aria-live="assertive"></span>
+  <div class="scene-shell"><div class="scene" id="scene">
+<svg class="architecture" viewBox="0 0 900 550" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+<defs>
+  <linearGradient id="g-back" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3f3c"/><stop offset=".6" stop-color="#303532"/><stop offset="1" stop-color="#262a28"/></linearGradient>
+  <linearGradient id="g-left" x1="0" x2="1"><stop offset="0" stop-color="#141716"/><stop offset="1" stop-color="#2b302d"/></linearGradient>
+  <linearGradient id="g-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b312d"/><stop offset="1" stop-color="#101312"/></linearGradient>
+  <linearGradient id="g-door" x1="0" x2="1"><stop offset="0" stop-color="#3a4750"/><stop offset=".55" stop-color="#4b5963"/><stop offset="1" stop-color="#344048"/></linearGradient>
+  <linearGradient id="g-steel" x1="0" x2="1"><stop offset="0" stop-color="#585f61"/><stop offset=".42" stop-color="#8d9496"/><stop offset=".58" stop-color="#7a8183"/><stop offset="1" stop-color="#50575a"/></linearGradient>
+  <linearGradient id="g-stair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#323834"/><stop offset="1" stop-color="#1c201e"/></linearGradient>
+  <linearGradient id="g-warm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff7e2"/><stop offset="1" stop-color="#ffcf73"/></linearGradient>
+  <linearGradient id="g-warm-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd27a" stop-opacity=".55"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></linearGradient>
+  <radialGradient id="g-light" cx="470" cy="66" r="440" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#eafff3" stop-opacity=".3"/><stop offset=".4" stop-color="#cfeedd" stop-opacity=".09"/><stop offset="1" stop-color="#cfeedd" stop-opacity="0"/></radialGradient>
+  <radialGradient id="g-exit" cx="470" cy="106" r="130" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3dffa0" stop-opacity=".42"/><stop offset="1" stop-color="#3dffa0" stop-opacity="0"/></radialGradient>
+  <radialGradient id="g-halo"><stop offset="0" stop-color="#3dffa0" stop-opacity=".35"/><stop offset="1" stop-color="#3dffa0" stop-opacity="0"/></radialGradient>
+  <radialGradient id="g-red"><stop offset="0" stop-color="#ff4a3a" stop-opacity=".5"/><stop offset="1" stop-color="#ff4a3a" stop-opacity="0"/></radialGradient>
+  <radialGradient id="g-pool"><stop offset="0" stop-color="#d9f5e6" stop-opacity=".16"/><stop offset="1" stop-color="#d9f5e6" stop-opacity="0"/></radialGradient>
+  <filter id="f-glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="f-noise" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .6 -.2"/></filter>
+</defs>
+<rect width="900" height="550" fill="#101211"/>
+<!-- ceiling -->
+<path d="M0 0H900V62H222Z" fill="#131615"/>
+<rect x="384" y="60" width="172" height="6" rx="1" fill="#262b29"/>
+<!-- back wall -->
+<rect x="222" y="62" width="678" height="370" fill="url(#g-back)"/>
+<path d="M222 192H900M342 62V318M582 62V318M822 62V318" stroke="#000" stroke-opacity=".16"/>
+<g fill="#1d2120" opacity=".8"><circle cx="262" cy="104" r="2.2"/><circle cx="302" cy="104" r="2.2"/><circle cx="262" cy="150" r="2.2"/><circle cx="302" cy="150" r="2.2"/><circle cx="382" cy="104" r="2.2"/><circle cx="582" cy="104" r="2.2" opacity="0"/><circle cx="622" cy="104" r="2.2"/><circle cx="622" cy="150" r="2.2"/><circle cx="862" cy="104" r="2.2"/><circle cx="862" cy="150" r="2.2"/><circle cx="262" cy="236" r="2.2"/><circle cx="302" cy="282" r="2.2"/><circle cx="622" cy="236" r="2.2"/><circle cx="862" cy="236" r="2.2"/><circle cx="862" cy="282" r="2.2"/></g>
+<rect x="222" y="318" width="678" height="114" fill="#212725"/>
+<rect x="222" y="314" width="678" height="4" fill="#2fae73" opacity=".5"/>
+<!-- left wall -->
+<path d="M0 0L222 62V432L0 550Z" fill="url(#g-left)"/>
+<path d="M0 384L222 318V432L0 550Z" fill="#181c1a"/>
+<path d="M0 381L222 315" stroke="#2fae73" stroke-width="4" opacity=".4"/>
+<path d="M222 62V432" stroke="#090b0a" stroke-width="2" opacity=".7"/>
+<!-- painted floor number -->
+<g transform="matrix(.86 .28 0 1 0 0)" font-family="'Barlow Condensed','Arial Narrow',sans-serif">
+  <text id="scene-floor" x="24" y="200" font-weight="800" font-size="116" fill="#ebe8df" opacity=".85" letter-spacing="-1">14F</text>
+  <text x="28" y="226" font-weight="600" font-size="14" letter-spacing="3" fill="#ebe8df" opacity=".45">STAIRS · EAST</text>
+</g>
+<!-- stairs up -->
+<g id="svg-stairs">
+  <path d="M0 518H24V488H48V458H72V428H96V398H120V368H144V338H168V308H192V278H222V432L0 550Z" fill="url(#g-stair)"/>
+  <path d="M0 518H24V488H48V458H72V428H96V398H120V368H144V338H168V308H192V278H222" fill="none" stroke="#505852" stroke-width="2"/>
+  <path d="M0 518h8M24 488h8M48 458h8M72 428h8M96 398h8M120 368h8M144 338h8M168 308h8M192 278h8" stroke="#e0b400" stroke-width="3" opacity=".75"/>
+  <path d="M36 409V488M108 319V398M180 229V308" stroke="#6f7672" stroke-width="3"/>
+  <path d="M0 457L222 180" stroke="#000" stroke-width="6" opacity=".35"/>
+  <path d="M0 454L222 177" stroke="#a2a8a3" stroke-width="5" stroke-linecap="round"/>
+</g>
+<!-- floor -->
+<path d="M0 550L222 432H900V550Z" fill="url(#g-floor)"/>
+<rect x="222" y="424" width="678" height="8" fill="#181c1a"/>
+<path d="M330 432L250 550M470 432V550M610 432L690 550M760 432L920 550" stroke="#fff" stroke-opacity=".035"/>
+<ellipse cx="470" cy="470" rx="340" ry="70" fill="url(#g-pool)"/>
+<!-- notice -->
+<g transform="rotate(-2 293 220)">
+  <rect x="256" y="173" width="82" height="104" fill="#000" opacity=".35"/>
+  <rect x="252" y="168" width="82" height="104" fill="#e7e2d4"/>
+  <rect x="252" y="168" width="82" height="22" fill="#2a9e68"/>
+  <text x="293" y="183" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-weight="700" font-size="10" letter-spacing="2" fill="#fff">NOTICE</text>
+  <path d="M262 204h56M262 216h62M262 228h44M262 246h58M262 258h36" stroke="#99937f" stroke-width="3"/>
+  <circle cx="293" cy="171" r="3" fill="#d24a3a"/>
+</g>
+<!-- door -->
+<path d="M386 432H554L580 448H360Z" fill="#000" opacity=".28"/>
+<rect x="392" y="140" width="156" height="292" fill="#1b2124"/>
+<rect x="401" y="149" width="138" height="283" fill="url(#g-door)"/>
+<path d="M402 150V431" stroke="#fff" stroke-opacity=".08" stroke-width="2"/>
+<rect x="470" y="150" width="56" height="10" rx="1" fill="#283034"/>
+<rect x="446" y="178" width="48" height="66" fill="#1a2829" stroke="#262f31" stroke-width="2"/>
+<path d="M446 194h48M446 210h48M446 226h48M458 178v66M470 178v66M482 178v66" stroke="#7d9a96" stroke-opacity=".3"/>
+<path d="M448 180h16l-16 30Z" fill="#fff" opacity=".06"/>
+<rect x="432" y="256" width="76" height="20" rx="2" fill="#101414" stroke="#39434a"/>
+<text id="svg-door-label" x="470" y="270" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10.5" letter-spacing="2" fill="#d5dcd5">LOBBY</text>
+<rect x="408" y="295" width="9" height="16" rx="1" fill="#6e7679"/><rect x="523" y="295" width="9" height="16" rx="1" fill="#6e7679"/>
+<rect x="412" y="298" width="116" height="10" rx="5" fill="#b3babc"/>
+<path d="M416 300h108" stroke="#fff" stroke-opacity=".4"/>
+<!-- open door (win) -->
+<g id="open-door" hidden>
+  <rect x="401" y="149" width="138" height="283" fill="url(#g-warm)"/>
+  <path d="M401 432H539L652 550H288Z" fill="url(#g-warm-floor)"/>
+  <path d="M539 149L520 162V420L539 432Z" fill="#2c363d"/>
+  <text x="470" y="210" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-weight="800" font-size="22" letter-spacing="5" fill="#7a4d12">WELCOME</text>
+  <text x="470" y="230" text-anchor="middle" font-family="'Barlow Condensed',sans-serif" font-weight="600" font-size="12" letter-spacing="3" fill="#9a6a28">AIDD #7</text>
+  <g fill="#8a5a1e" opacity=".5"><circle cx="430" cy="318" r="9"/><circle cx="470" cy="312" r="9"/><circle cx="508" cy="320" r="9"/><path d="M414 350c0-14 7-21 16-21s16 7 16 21ZM454 344c0-14 7-21 16-21s16 7 16 21ZM492 352c0-14 7-21 16-21s16 7 16 21Z"/></g>
+  <rect x="408" y="352" width="124" height="5" fill="#8a5a1e" opacity=".5"/>
+  <g fill="#fff"><rect x="420" y="342" width="18" height="10" opacity=".9"/><rect x="460" y="336" width="18" height="10" opacity=".9"/><rect x="498" y="344" width="18" height="10" opacity=".9"/></g>
+</g>
+<!-- exit sign + ceiling light -->
+<ellipse cx="470" cy="106" rx="150" ry="64" fill="url(#g-exit)"/>
+<rect x="416" y="88" width="108" height="36" rx="3" fill="#18b86a" filter="url(#f-glow)"/>
+<rect x="416" y="88" width="108" height="36" rx="3" fill="none" stroke="#7dffc0" stroke-opacity=".5"/>
+<g transform="translate(423 91) scale(1.15)" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="3" r="2" fill="#fff" stroke="none"/><path d="M12 7L9 14M12 8l4 2 3-1M11.5 8L7 9.5M9 14l4 3v5M9 14l-2 4-4 1"/></g>
+<text x="455" y="113" font-family="'Barlow Condensed',sans-serif" font-weight="800" font-size="19" letter-spacing="1.5" fill="#fff">EXIT</text>
+<path d="M499 106h14M508 101l5 5-5 5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="tube-glow"><rect width="900" height="550" fill="url(#g-light)"/><rect x="390" y="64" width="160" height="6" rx="3" fill="#f4fff8" filter="url(#f-glow)"/></g>
+<!-- terminal -->
+<g id="svg-terminal">
+  <ellipse class="term-halo" cx="603" cy="240" rx="70" ry="52" fill="url(#g-halo)"/>
+  <rect x="574" y="214" width="58" height="92" rx="5" fill="#181d1c" stroke="#3a4342"/>
+  <rect class="term-screen" x="582" y="224" width="42" height="28" rx="2"/>
+  <text class="term-text" x="603" y="242" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="8" font-weight="700" letter-spacing="1">GUIDE</text>
+  <g fill="#47514e"><circle cx="589" cy="266" r="2.6"/><circle cx="603" cy="266" r="2.6"/><circle cx="617" cy="266" r="2.6"/><circle cx="589" cy="278" r="2.6"/><circle cx="603" cy="278" r="2.6"/><circle cx="617" cy="278" r="2.6"/><circle cx="589" cy="290" r="2.6"/><circle cx="603" cy="290" r="2.6"/><circle cx="617" cy="290" r="2.6"/></g>
+</g>
+<!-- hydrant cabinet -->
+<ellipse cx="603" cy="326" rx="26" ry="16" fill="url(#g-red)"/>
+<circle cx="603" cy="326" r="4.5" fill="#ff5141" filter="url(#f-glow)"/>
+<rect x="580" y="340" width="46" height="74" rx="2" fill="#7a2820" stroke="#4d1813"/>
+<rect x="586" y="346" width="34" height="62" fill="none" stroke="#9b3a30"/>
+<text x="603" y="381" text-anchor="middle" font-family="'Zen Kaku Gothic New',sans-serif" font-weight="700" font-size="9.5" fill="#f3d9d4">消火栓</text>
+<!-- elevator -->
+<rect x="664" y="150" width="200" height="282" fill="#1a1e1f"/>
+<rect x="664" y="150" width="200" height="282" fill="none" stroke="#5a6264" stroke-width="2"/>
+<rect x="676" y="164" width="87" height="268" fill="url(#g-steel)"/>
+<rect x="765" y="164" width="87" height="268" fill="url(#g-steel)"/>
+<path d="M764 164V432" stroke="#202425" stroke-width="2"/>
+<path d="M690 164L676 220V164ZM790 164H808L770 330V250Z" fill="#fff" opacity=".06"/>
+<rect x="728" y="124" width="72" height="20" rx="2" fill="#0b0d0c" stroke="#2c3331"/>
+<text x="764" y="139" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="12" fill="#ff8a3d" opacity=".9">− −</text>
+<rect x="872" y="272" width="16" height="46" rx="2" fill="#6c7375"/>
+<circle cx="880" cy="285" r="4" fill="#272c2d" stroke="#a3aaac"/><circle cx="880" cy="305" r="4" fill="#272c2d" stroke="#a3aaac"/>
+<!-- grain -->
+<rect width="900" height="550" filter="url(#f-noise)" opacity=".35"/>
+</svg>
+    <div class="scene-top"><span id="scene-title">STAIRWELL / EAST</span><small id="scene-mood">空調の音だけが、響いている。</small></div>
+    <button class="spot door" id="door">扉を調べる</button><button class="spot elevator" id="elevator">エレベーター</button><button class="spot detail" id="detail">掲示物</button><button class="spot panel" id="panel">館内端末</button>
+  </div><div class="scene-caption"><span class="dot"></span><span id="caption">扉は閉まった。目指す会場は、17階。</span></div></div>
+  <nav class="floor-nav" aria-label="階の移動"><button class="nav-button" id="down"><span class="arr" aria-hidden="true">↓</span>下の階へ</button><span class="floor-line">FLOOR<b id="current-floor">14</b>/ 18</span><button class="nav-button" id="up">上の階へ<span class="arr" aria-hidden="true">↑</span></button></nav>
+  <div class="story" aria-live="polite" aria-atomic="true"><span class="label" id="story-label">01 / 閉じた扉</span><p id="story">入った扉を押してみる。……開かない。各階の踊り場を調べて、会場へ入る方法を探そう。</p></div>
+</section>
+<aside class="sidebar" aria-label="現在地と持ち物">
+  <section class="card"><div class="aside-title"><h2>館内マップ</h2><span class="count">14F — 18F</span></div><div class="map" id="map"></div></section>
+  <section class="card"><div class="aside-title"><h2>持ち物と手がかり</h2><span class="count" id="item-count">01</span></div><div class="items" id="items"></div></section>
+  <section class="card"><div class="aside-title"><h2>やること</h2><span class="count" id="task-count">0 / 4</span></div><ol class="tasks" id="tasks"></ol></section>
+  <button class="help" id="hint">詰まったら、ヒントを見る</button>
+</aside>
+</main>
+<footer><span>体験談をもとにしたフィクション。館内構造・謎・端末は架空です。</span><a href="https://aid.connpass.com/event/403530/" target="_blank" rel="noopener noreferrer">着想になったイベント ↗</a></footer>
+</div>
+<dialog id="modal" aria-labelledby="modal-title"><div class="modal-head"><span id="modal-tag">OBSERVATION</span><div class="modal-timer" id="modal-timer" aria-label="残り時間"></div><button class="close" id="close" aria-label="閉じる"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div class="modal-body" id="modal-body"></div></dialog>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id), key='wrong-door-save-v1';
+const phoneIcon='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18.3h3"/></svg>';
+const fresh=()=>({version:1,started:false,floor:14,visited:[14],clues:[],pin:false,called:false,authorized:false,won:false,moves:0,hints:0,elapsed:0,deadline:0,expired:false,extensions:0});
+let s=fresh(),sound=false,audio=null,bells=[],lastTime=Date.now(),warned=false;
+try{const saved=JSON.parse(localStorage.getItem(key));if(saved&&saved.version===1&&[14,15,16,17,18].includes(saved.floor)&&Array.isArray(saved.clues)&&Array.isArray(saved.visited)){s={...fresh(),...saved,clues:saved.clues.filter(x=>['moon','sun','star'].includes(x)),visited:saved.visited.filter(x=>[14,15,16,17,18].includes(x))}}}catch{}
+if(s.started&&!s.deadline&&!s.won){s.deadline=Date.now()+600000;s.expired=false;}
+const floors={14:{label:'入った階',mood:'背後で閉まった扉。もう、戻れない。',caption:'ここから入ったはずの扉は、片側通行だった。'},15:{label:'踊り場',mood:'壁に、イベントの小さな案内がある。',caption:'かすかな足音。けれど、扉の向こうは静かだ。'},16:{label:'館内端末',mood:'館内端末の緑色の表示が、点灯している。',caption:'ここだけ端末に電源が入っている。'},17:{label:'会場の階',mood:'扉の向こうから、キーボードの音がする。',caption:'会場は、この向こう。あと一枚の扉。'},18:{label:'上の踊り場',mood:'階段はここで行き止まり。壁に説明書がある。',caption:'上へ行くだけでは、会場には着かない。'}};
+const clues={moon:{title:'14F / 月のプレート',icon:'☾',summary:'月のそばに、ひとつの数字。',body:'壁のプレートに、月のマークと数字が刻まれている。',evidence:'☾ 月 ＝ 4'},sun:{title:'15F / イベント案内',icon:'☼',summary:'会場と、太陽のマーク。',body:'イベント案内の裏に、太陽のマークを見つけた。案内は探索メモに写しておこう。',evidence:'AIDDもくもく会（東京） #7\n2026.10.04 / 開始 13:00\n会場：17F\n──────────────\n☼ 太陽 ＝ 0'},star:{title:'18F / 端末の説明書',icon:'☆',summary:'星の数字と、呼び出し手順。',body:'これは架空の来館者向け案内端末の説明書だ。すべての手順が、ここにある。',evidence:'☆ 星 ＝ 3\n\n端末の数字は、月 → 太陽 → 星。\n呼出音は、短い音 → 短い音 → 長い音。\n入場案内には、参加イベントの情報を。'}};
+function tick(){const now=Date.now();if(s.started&&!s.won&&!s.expired)s.elapsed+=Math.max(0,Math.min(now,s.deadline||now)-lastTime);lastTime=now}
+function save(){tick();try{localStorage.setItem(key,JSON.stringify(s))}catch{}}
+function tone(long=false){if(!sound)return;try{audio=audio||new(window.AudioContext||window.webkitAudioContext)();audio.resume();const o=audio.createOscillator(),g=audio.createGain();o.type='sine';o.frequency.value=long?430:620;g.gain.setValueAtTime(.035,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+(long?.65:.16));o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+(long?.68:.18))}catch{}}
+function log(text,label='探索記録'){ $('story').textContent=text;$('story-label').textContent=label;}
+function show(tag,title,html){$('modal-tag').textContent=tag;$('modal-body').innerHTML='<h2 id="modal-title">'+title+'</h2>'+html;if(!$('modal').open)$('modal').showModal();}
+function close(){if(s.expired)return;$('modal').close();}
+function intro(){show('PROLOGUE / TIME LIMIT 10 MIN','扉が、閉まった。','<div class="hero-label">非常階段 — THE WRONG DOOR</div><p>2026年10月4日。AI駆動開発のもくもく会に参加するため、ビルに入った。会場は17階。</p><p>案内を探して、何気なく押した扉。<br>一歩入った直後、背後で重い音がした。</p><div class="evidence">ガチャン。<br>……あれ。戻れない。</div><p>各階には扉とエレベーター。でも、どれも開かない。階段を行き来して、会場へ入る方法を探そう。開演まで、あと10分。</p><div class="intro-card"><strong>遊び方</strong>画面の光る点を押して調べる。下のボタンで階を移動。手がかりは探索メモに残ります。制限時間は10分。謎を読んでいる間も時間は進みます。時間切れになったら、再挑戦か5分延長を選べます。</div><button class="primary" id="begin">探索をはじめる →</button><p class="source-note" style="margin-top:18px">体験談から着想した創作ゲームです。17階の会場とイベント名以外の館内描写・仕組みは架空です。</p>');$('begin').onclick=()=>{s.started=true;lastTime=Date.now();s.deadline=lastTime+600000;save();close();render();updateClock()}}
+function render(){const f=floors[s.floor];$('close').disabled=s.expired;$('app').classList.toggle('win',s.won);$('scene').dataset.floor=s.floor;$('current-floor').textContent=s.floor;$('scene-floor').textContent=s.floor+'F';$('svg-terminal').classList.toggle('on',s.floor===16);$('svg-stairs').style.display=s.floor===18?'none':'';$('scene-mood').textContent=s.won?'扉の向こうに、いつもの日常がある。':f.mood;$('caption').textContent=s.won?'会場に到着。ようやく、もくもくできる。':s.floor===17&&s.authorized?'認証が済んだ。スマートフォンで入場しよう。':f.caption;$('session-label').textContent=s.won?'ARRIVED AT THE VENUE':'IN THE STAIRWELL';$('svg-door-label').textContent=s.floor===17?'AIDD #7':'LOBBY';$('open-door').removeAttribute('hidden');$('open-door').style.display=s.won?'block':'none';$('down').disabled=s.floor===14||s.won||s.expired;$('up').disabled=s.floor===18||s.won||s.expired;$('panel').hidden=s.floor!==16;$('detail').textContent=s.floor===17?'会場の案内':s.floor===16?'端末の貼り紙':s.floor===18?'説明書を読む':'掲示物';$('door').textContent=s.won?'会場に入った':s.floor===17&&s.authorized?'入場する':'扉を調べる';$('map').innerHTML=[18,17,16,15,14].map(n=>{const here=n===s.floor,seen=s.visited.includes(n);return '<div class="floor-row'+(here?' active':'')+(n===17?' goal':'')+(seen?' seen':'')+'"'+(here?' aria-current="location"':'')+'><span class="number">'+n+'<small>F</small></span><span class="where">'+floors[n].label+'</span><span class="visited">'+(here?'現在地':n===17?'GOAL':seen?'探索済':'')+'</span></div>'}).join('');$('items').innerHTML='<button class="item" data-item="phone"><span class="item-icon">'+phoneIcon+'</span><span>スマートフォン<small>参加証をオフライン保存済み</small></span></button>'+s.clues.map(c=>'<button class="item" data-item="'+c+'"><span class="item-icon">'+clues[c].icon+'</span><span>'+clues[c].title+'<small>'+clues[c].summary+'</small></span></button>').join('');$('item-count').textContent=String(s.clues.length+1).padStart(2,'0');const tasks=[['階に散らばる手がかりを集める',s.clues.length===3],['館内端末でスタッフを呼び出す',s.called],['参加イベントを伝える',s.authorized],['17階の会場に到達する',s.won]];$('tasks').innerHTML=tasks.map(([t,done])=>'<li class="'+(done?'done':'')+'">'+t+'</li>').join('');$('task-count').textContent=tasks.filter(t=>t[1]).length+' / '+tasks.length;$('items').querySelectorAll('button').forEach(b=>b.onclick=()=>b.dataset.item==='phone'?phone():inspect(b.dataset.item));}
+function move(d){if(s.won||!canPlay())return;const floor=s.floor+d;if(!floors[floor])return;s.floor=floor;s.moves++;if(!s.visited.includes(floor))s.visited.push(floor);tone();save();render();log(floors[floor].mood,'FLOOR '+floor+' / 踊り場');}
+function inspect(c){if(!canPlay())return;if(!s.clues.includes(c)){s.clues.push(c);save();render();log(clues[c].title+'を探索メモに記録した。')}const clue=clues[c];show('CLUE / '+clue.title,clue.title.split(' / ')[1],'<p>'+clue.body+'</p><div class="evidence">'+clue.evidence+'</div><button class="primary" id="keep">メモに残して戻る</button>');$('keep').onclick=close;}
+function detail(){if(!canPlay())return;if(s.floor===14)inspect('moon');if(s.floor===15)inspect('sun');if(s.floor===18)inspect('star');if(s.floor===16){show('OBSERVATION / 16F','光っている端末。','<p>液晶に「来館者案内」とある。電源は入っているが、数字の入力が必要らしい。</p><div class="evidence">月 → 太陽 → 星<br>各マークの数字を、左から入力。</div><p>この端末は扉を直接開けるものではない。館内スタッフに、入場案内をお願いできる。</p><button class="primary" id="use-terminal">端末を操作する</button>');$('use-terminal').onclick=terminal;}if(s.floor===17)show('OBSERVATION / 17F','会場は、すぐそこ。','<div class="evidence">AIDDもくもく会（東京） #7<br>13:00 開始 / 会場 17F</div><p>人の話し声が聞こえる。扉の横に参加証リーダーがある。表示は「'+(s.authorized?'案内済み：参加証をかざしてください':'入場案内待ち')+'」。</p><p>階段からの来場者は、館内端末でスタッフの案内を受ける必要があるようだ。</p>');}
+function door(){if(!canPlay())return;if(s.won){ending();return}if(s.floor===17&&s.authorized){show('FINAL STEP / 17F','会場まで、あと一枚。','<p>参加証リーダーが緑色に光っている。スタッフからの案内は届いた。</p><div class="evidence">入場案内：確認済み<br>参加証：スマートフォンに保存済み</div><button class="primary" id="scan">スマートフォンの参加証をかざす →</button>');$('scan').onclick=()=>{if(!canPlay())return;tick();s.won=true;save();tone(true);render();log('重い扉が、今度は軽く開く。「こんにちは。もくもく会はこちらです！」','CLEAR / 会場に到着');ending()};return}show('OBSERVATION / '+s.floor+'F','扉は、開かない。','<p>'+ (s.floor===14?'入ってきた扉には、こちら側のハンドルがない。どうやら片側からしか通れない扉だった。':s.floor===17?'ノブを回しても、扉は動かない。向こうには会場があるのに。参加証リーダーには「入場案内待ち」と出ている。':'扉を押しても、引いても、びくともしない。階段側からの入場には案内が必要らしい。')+'</p><p>扉を調べただけでは先に進めない。踊り場の掲示物や、ほかの階を調べよう。</p>');log(s.floor+'階の扉は施錠されている。');}
+function elevator(){if(!canPlay())return;show('OBSERVATION / '+s.floor+'F','エレベーターも、沈黙。','<p>呼び出しボタンを押す。表示は「− −」のまま。</p><div class="evidence">階段側ロビー：利用停止中<br>来館者案内は、16Fの館内端末へ。</div><p>この側からエレベーターには乗れない。階段なら、上下に移動できる。</p>');log('エレベーターは反応しない。16階の端末を使う必要がありそうだ。');}
+function terminal(){if(!canPlay())return;if(s.authorized){show('TERMINAL / 16F','入場案内を送信しました。','<div class="evidence">AIDD #7 / 13:00<br>案内先：17F</div><p>スタッフ「17階の扉で、保存済みの参加証をかざしてください。お待ちしています！」</p>');return}if(s.called){identity();return}if(s.pin){call();return}show('PUZZLE 01 / TERMINAL','3つのマーク、3つの数字。','<p>端末に小さなマークが並んでいる。各階の掲示物に、対応する数字があるはずだ。</p><div class="evidence">月 → 太陽 → 星</div><form id="pin-form"><label class="input-label" for="pin">3桁の数字を入力</label><input class="pin" id="pin" inputmode="numeric" autocomplete="off" maxlength="3" pattern="[0-9０-９]{3}" aria-describedby="pin-error" required><p class="error" role="alert" id="pin-error"></p><button class="primary" type="submit">案内モードを開く →</button></form>');$('pin-form').onsubmit=e=>{e.preventDefault();if(!canPlay())return;const code=$('pin').value.replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xfee0));if(code==='403'){s.pin=true;save();tone();log('館内端末が起動した。次はスタッフを呼び出そう。');call()}else{$('pin-error').textContent='数字が違うようだ。月・太陽・星の順に、メモを見直そう。';tone(true)}};}
+function call(){bells=[];show('PUZZLE 02 / CALL','呼び出しのリズム。','<p>短い音と長い音を組み合わせて、スタッフを呼び出せる。上の階にあった説明書が役に立ちそうだ。</p><div class="bell-display" id="bell-display" aria-live="polite">＿ ＿ ＿</div><div class="bells"><button class="nav-button" id="short">短い音 ●</button><button class="nav-button" id="long">長い音 ━</button></div><p class="error" id="bell-error" role="alert"></p><div class="modal-actions"><button class="primary" id="send-call">このリズムで呼び出す</button><button class="quiet" id="clear-call">入力を消す</button></div>');const add=x=>{if(!canPlay())return;if(bells.length>=3){$('bell-error').textContent='3つの音が入力済み。変更する場合は「入力を消す」を押そう。';return}bells.push(x);tone(x==='L');$('bell-display').textContent=bells.map(n=>n==='S'?'●':'━').concat(Array(3-bells.length).fill('＿')).join(' ');$('bell-error').textContent=''};$('short').onclick=()=>add('S');$('long').onclick=()=>add('L');$('clear-call').onclick=call;$('send-call').onclick=()=>{if(!canPlay())return;if(bells.join('')==='SSL'){s.called=true;save();render();log('呼出音のあと、スタッフの声が聞こえた。');identity()}else{$('bell-error').textContent='応答がない。18階の説明書で、3つの音の順番を確認しよう。'}};}
+function identity(){show('PUZZLE 03 / STAFF','「どちらのイベントですか？」','<p>端末から、やっと人の声がした。</p><div class="evidence">スタッフ「階段側にいらっしゃるんですね。<br>参加イベントの回数と開始時刻を教えてください」</div><p>壁の案内にあった情報を伝えよう。</p><div class="answer-list"><button data-answer="wrong">AIDDもくもく会 #6 / 13:00</button><button data-answer="right">AIDDもくもく会 #7 / 13:00</button><button data-answer="wrong">AIDDもくもく会 #7 / 17:00</button></div><p class="error" id="identity-error" role="alert"></p>');$('modal-body').querySelectorAll('[data-answer]').forEach(b=>b.onclick=()=>{if(!canPlay())return;if(b.dataset.answer==='right'){s.authorized=true;save();render();tone();log('17階への入場案内が届いた。会場の扉でスマートフォンの参加証を使おう。','03 / もうすぐ会場');show('ACCESS GRANTED','「17階で、お待ちしています」','<p>スタッフ「確認できました。17階の入場案内を有効にします。スマートフォンに保存された参加証を、扉の横にかざしてください」</p><div class="evidence">17F / 入場案内済み ✓</div><button class="primary" id="return-stairs">階段に戻る →</button>');$('return-stairs').onclick=close}else{$('identity-error').textContent='スタッフ「そのイベントは確認できませんでした。掲示の案内をご確認ください」'}});}
+function phone(){if(!canPlay())return;show('INVENTORY / PHONE','スマートフォン。','<p>階段では電波が届かない。連絡アプリは送信待ちのままだ。</p><div class="evidence">保存済みの参加証<br>AIDDもくもく会（東京） #7<br>2026.10.04 / 13:00 / 17F</div><p>参加証はオフラインでも表示できる。入場案内が済んだら、会場の扉で使えそうだ。</p>');}
+function notebook(){if(!canPlay())return;show('EXPLORATION NOTES','探索メモ。','<div class="note-list"><article><h3>目的地</h3><p>AIDDもくもく会（東京） #7 / 13:00 / 17F</p></article>'+s.clues.map(c=>'<article><h3>'+clues[c].title+'</h3><p style="white-space:pre-line">'+clues[c].evidence+'</p></article>').join('')+(s.clues.length===0?'<p>まだ掲示物を調べていない。14・15・18階を探索してみよう。</p>':'')+'<article><h3>現在の状況</h3><p>'+ (s.won?'会場に到着！':s.authorized?'入場案内済み。17階の扉で参加証を使おう。':s.called?'スタッフが応答した。イベント情報を伝えよう。':s.pin?'16階の端末が起動した。呼び出しのリズムを入力しよう。':'各階の扉は施錠中。16階に案内端末がある。')+'</p></article></div>');}
+function hint(){if(!canPlay())return;const hints=s.won?['もう会場に到着しています。今日のネタを、もくもく会で披露しよう。']:!s.pin?['14・15・18階の掲示物を調べよう。16階の端末には、3つの数字が必要。','端末の順番は「月 → 太陽 → 星」。数字はそれぞれ別の階にある。','月は4、太陽は0、星は3。16階の端末に「403」を入力しよう。']:!s.called?['18階の説明書に、呼び出し手順が書いてある。','短い音を2回。そのあとに、長い音を1回。','16階の端末で「短い音 → 短い音 → 長い音」を入力し、呼び出そう。']:!s.authorized?['スタッフに、参加するイベントの情報を伝えよう。','17は会場の階数。開始時刻は13:00。','正しい案内は「AIDDもくもく会 #7 / 13:00」。']:['17階に戻って、会場の扉を調べよう。','持っているスマートフォンには参加証が保存されている。','17階の「入場する」から、参加証をかざそう。'];let tier=0;const draw=()=>{show('HINT / '+(tier+1),'小さな手がかり。','<p>'+hints[tier]+'</p><div class="modal-actions">'+(tier<hints.length-1?'<button class="primary" id="more-hint">もう少し詳しく</button>':'')+'<button class="nav-button" id="back-hint">探索に戻る</button></div>');$('back-hint').onclick=close;if($('more-hint'))$('more-hint').onclick=()=>{tier++;s.hints++;save();draw()}};s.hints++;save();draw();}
+function ending(){const secs=Math.floor(s.elapsed/1000),time=Math.floor(secs/60)+'分'+String(secs%60).padStart(2,'0')+'秒';show('ESCAPED / WELCOME TO 17F',s.extensions?'遅れても、会場に到達。':'開演前に、会場に到達。','<div class="ending-number">17F ↗</div><p>ドアが開く。聞こえるのは、キーボードを叩く音。<br>受付の人が、笑顔でこちらを見る。</p><div class="evidence">「こんにちは！ お待ちしていました」</div><p>ようやく席に着き、パソコンを開く。<br>今日つくるものは、もう決まっていた。<br><strong class="scan-light">—— 非常階段の脱出ゲームだ。</strong></p><p class="time-note">'+(s.extensions?'延長して到着 / 延長 '+s.extensions+'回':'10分以内の脱出成功！')+'</p><div class="stats"><span>探索時間<b>'+time+'</b></span><span>階の移動<b>'+s.moves+'回</b></span><span>ヒント<b>'+s.hints+'回</b></span></div><div class="modal-actions"><button class="primary" id="end-close">会場を眺める</button><button class="nav-button" id="play-again">もう一度遊ぶ</button></div>');$('end-close').onclick=close;$('play-again').onclick=restart;}
+function restart(){show('NEW GAME','最初から、もう一度。','<p>探索の進み具合とメモを消して、14階からやり直します。</p><div class="modal-actions"><button class="primary" id="confirm-restart">最初からはじめる</button><button class="nav-button" id="cancel-restart">戻る</button></div>');$('cancel-restart').onclick=close;$('confirm-restart').onclick=()=>{s=fresh();warned=false;lastTime=Date.now();save();render();updateClock();log('入った扉を押してみる。……開かない。各階の踊り場を調べて、会場へ入る方法を探そう。','01 / 閉じた扉');intro()};}
+$('up').onclick=()=>move(1);$('down').onclick=()=>move(-1);$('door').onclick=door;$('elevator').onclick=elevator;$('detail').onclick=detail;$('panel').onclick=terminal;$('notes').onclick=notebook;$('hint').onclick=hint;$('restart').onclick=restart;$('close').onclick=close;$('sound').onclick=()=>{sound=!sound;$('sound').textContent='音 '+(sound?'ON':'OFF');$('sound').setAttribute('aria-pressed',String(sound));tone()};$('modal').addEventListener('cancel',e=>{if(!s.started||s.expired)e.preventDefault()});$('modal').addEventListener('click',e=>{if(e.target===$('modal')&&s.started&&!s.expired){const r=$('modal').getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)close()}});$('close').addEventListener('click',()=>{if(!s.started){s.started=true;lastTime=Date.now();s.deadline=lastTime+600000;save();updateClock()}});function canPlay(){if(s.expired){timeUp();return false}if(s.started&&!s.won&&s.deadline&&Date.now()>=s.deadline){expire();return false}return true}
+function expire(){if(s.expired||s.won)return;tick();s.expired=true;save();render();log('会場から、開演の挨拶が聞こえる。あと少しだったのに。','TIME UP / 開演');$('time-warning').textContent='時間切れです。再挑戦か5分延長を選べます。';tone(true);timeUp()}
+function timeUp(){show('TIME UP / 13:00','開演してしまった。','<div class="ending-number" style="color:var(--red);text-shadow:0 0 40px rgba(255,106,77,.35)">00:00</div><p>扉の向こうから、開演の挨拶が聞こえる。<br>会場まで、あと少しだったのに。</p><p>最初から挑戦するか、5分延長して探索を続けられます。延長すると「遅れて到着」のエンディングになります。</p><div class="modal-actions"><button class="primary" id="retry-time">もう一度挑戦する</button><button class="nav-button" id="extend-time">5分延長して続ける</button></div>');$('retry-time').onclick=()=>{s=fresh();warned=false;lastTime=Date.now();save();render();updateClock();intro()};$('extend-time').onclick=()=>{s.expired=false;s.extensions++;s.deadline=Date.now()+300000;lastTime=Date.now();warned=false;save();close();render();updateClock();log('5分延長して探索を再開。手がかりと端末の状態は、そのまま。','EXTRA TIME / あと5分')};}
+function updateClock(){let seconds=s.started?Math.max(0,Math.ceil((s.deadline-Date.now())/1000)):600;if(s.expired)seconds=0;const label=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');$('remaining').textContent=s.won?'ARRIVED':label;$('modal-timer').textContent=s.started&&!s.won?label:'';$('cd-fill').style.transform='scaleX('+(s.won?1:seconds/(s.extensions?300:600))+')';$('countdown').classList.toggle('urgent',s.started&&!s.won&&seconds<=60);$('countdown').classList.toggle('cleared',s.won);$('countdown-label').innerHTML=s.won?(s.extensions?'延長して会場に到着':'開演前に会場に到着'):s.extensions?'延長の残り時間<small>THE EVENT HAS STARTED</small>':'開演まで<small>MAKE IT BEFORE 13:00</small>';if(s.started&&!s.won&&!s.expired){if(seconds<=60&&!warned){warned=true;$('time-warning').textContent='残り1分です。';tone(true)}if(seconds===0)expire();}}
+window.addEventListener('pagehide',save);document.addEventListener('visibilitychange',save);render();updateClock();setInterval(updateClock,250);if(s.expired)timeUp();else if(!s.started)intro();else if(s.won)log('17階の会場に到着。今日つくるものは、非常階段の脱出ゲーム。','CLEAR / 会場に到着');else log('探索を再開しました。手がかりは「探索メモ」で確認できます。','CONTINUE / '+s.floor+'F');
+})();
+</script>
+</body></html>
