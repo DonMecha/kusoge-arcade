@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>【生配信】Grok Bot社畜オセロ 〜オラにスパチャを分けてくれ〜</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;
+ font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans CJK JP","Yu Gothic UI","Yu Gothic","Meiryo",system-ui,sans-serif;color:#eee}
+#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:center center;background:#0b0b0d;overflow:hidden}
+.panel{position:absolute;background:#141417;border:1px solid #2a2a30;border-radius:10px}
+/* top bar */
+#top{left:8px;top:6px;width:1264px;height:54px;display:flex;align-items:center;padding:0 14px;gap:14px}
+.live{background:#e1251b;color:#fff;font-weight:900;font-size:20px;padding:4px 12px;border-radius:6px;letter-spacing:1px}
+#remain{font-weight:700;font-size:18px;min-width:90px}
+#viewers{font-size:12px;color:#9f9;white-space:nowrap}
+.tp{display:flex;align-items:center;gap:8px;font-weight:800;font-size:18px}
+.cnt{border:1px solid #3a3a42;background:#0d0d10;border-radius:8px;width:56px;height:38px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900}
+#topmid{flex:1;display:flex;justify-content:center;align-items:center;gap:14px}
+.dot{width:16px;height:16px;border-radius:50%;display:inline-block}
+.sep{width:1px;height:30px;background:#333}
+/* game area */
+#game{left:8px;top:68px;width:880px;height:572px;overflow:hidden;background:radial-gradient(circle at 50% 40%,#18241b,#0f1411 70%)}
+#boardwrap{position:absolute;left:182px;top:22px;width:516px;height:516px;background:#0c2412;border-radius:8px;padding:18px;box-shadow:0 6px 30px #000a}
+#board{position:relative;width:480px;height:480px;display:grid;grid-template-columns:repeat(8,60px);grid-template-rows:repeat(8,60px);background:#1f6b35;border:2px solid #0a1d0f}
+.cell{position:relative;border:1px solid #0e3d1c;display:flex;align-items:center;justify-content:center}
+.cell.hint::after{content:"";width:14px;height:14px;border-radius:50%;background:#ffffff30}
+.cell.last{background:#2a8045}
+.disc{width:var(--disc,50px);height:var(--disc,50px);position:relative}
+.disc svg{width:100%;height:100%;display:block;filter:drop-shadow(0 2px 2px #0008)}
+.disc.flip{animation:flip .42s ease-in-out}
+.disc.place{animation:place .3s ease-out}
+@keyframes flip{0%{transform:scaleX(1)}50%{transform:scaleX(0) scaleY(1.08)}100%{transform:scaleX(1)}}
+@keyframes place{0%{transform:scale(1.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.coord{display:none}
+.resv{position:absolute;inset:4px;border:2px dashed #ffcf3a;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#ffcf3a;font-weight:900;font-size:13px;background:#0008;transform:rotate(-8deg)}
+/* player cards */
+.pcard{position:absolute;top:22px;z-index:6;width:160px;padding:12px 10px;text-align:center;border-radius:12px;background:#111a14;border:2px solid #2a3a2f;transition:border-color .3s,box-shadow .3s}
+.pcard.turn{border-color:#ffd54a;box-shadow:0 0 18px #ffd54a55}
+#pc0{left:12px}#pc1{right:12px}
+.pcard .av{width:84px;height:84px;margin:0 auto 6px}
+.pcard .chibi{width:140px;height:160px;margin:-4px auto 2px}
+.chibi{position:relative;overflow:visible}
+.chibi .spr{position:absolute;left:50%;bottom:0;transform:translateX(-50%);image-rendering:pixelated;image-rendering:crisp-edges;animation:bob 1.2s steps(2,end) infinite;z-index:2}
+.chibi.turn .spr{animation-duration:.5s}
+@keyframes bob{0%{margin-bottom:0}100%{margin-bottom:4px}}
+.chibi .fx{position:absolute;left:50%;top:50%;width:200px;height:200px;margin:-100px 0 0 -100px;z-index:1;pointer-events:none}
+.chibi .fx.spd{animation:spin 2.5s linear infinite}
+.chibi .fx.imp{animation:imp .35s steps(2,end) infinite alternate}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes imp{from{transform:scale(.9)}to{transform:scale(1.08)}}
+.chibi .sweat{position:absolute;right:14px;top:22px;z-index:3;width:4px;height:4px;background:#7fd0ff;box-shadow:0 4px #7fd0ff,-4px 8px #7fd0ff,0 8px #7fd0ff,4px 8px #7fd0ff,-4px 12px #7fd0ff,0 12px #fff,4px 12px #7fd0ff,0 16px #7fd0ff;animation:drip 1s steps(3,end) infinite}
+@keyframes drip{to{transform:translateY(8px)}}
+.chibi .bub{position:absolute;left:0;top:4px;z-index:3;background:#fff;color:#000;font-weight:900;font-size:14px;line-height:14px;padding:2px 6px 6px;border:3px solid #000;box-shadow:3px 3px 0 #000}
+.chibi .sash{position:absolute;left:50%;bottom:22%;width:130%;margin-left:-65%;z-index:4;transform:rotate(-24deg);background:#e1251b;border:3px solid #ffd54a;color:#fff;font-weight:900;font-size:17px;text-align:center;text-shadow:2px 2px 0 #000;letter-spacing:1px}
+.chibi .box{position:absolute;left:-4%;right:-4%;bottom:-4px;height:46%;z-index:4;background:#c9965a;border:3px solid #6b4a22;box-shadow:inset 0 6px 0 #a87a42;display:flex;align-items:center;justify-content:center;color:#5a3a12;font-weight:900;font-size:22px}
+.chibi .box::before,.chibi .box::after{content:"";position:absolute;top:-14px;width:40%;height:12px;background:#b58448;border:3px solid #6b4a22}
+.chibi .box::before{left:-6px;transform:skewX(30deg)}.chibi .box::after{right:-6px;transform:skewX(-30deg)}
+.pname{font-weight:900;font-size:14px;overflow-wrap:anywhere;line-height:1.25;min-height:44px;display:flex;align-items:center;justify-content:center}
+.pstyle{font-size:11px;color:#9ab;margin-top:2px}
+.pnum{font-size:34px;font-weight:900;margin-top:4px}
+.think{height:20px;font-size:13px;color:#ffd54a;font-weight:700;visibility:hidden}
+.pcard.turn .think{visibility:visible}
+.gauge{margin-top:8px;text-align:left}
+.glabel{font-size:11px;color:#ccc;display:flex;justify-content:space-between}
+.gbar{height:12px;background:#222;border-radius:6px;overflow:hidden;border:1px solid #444;margin-top:3px}
+.gfill{height:100%;width:0;background:linear-gradient(90deg,#c98a00,#ffd54a,#fff2a8);transition:width .5s}
+.gauge.full .gbar{box-shadow:0 0 10px #ffd54a;animation:pulse .6s infinite alternate}
+@keyframes pulse{to{box-shadow:0 0 20px #ffd54a}}
+.sp{font-size:11px;color:#ffcf3a;margin-top:4px;min-height:15px}
+/* niconico */
+#nico{position:absolute;inset:0;pointer-events:none;z-index:5}
+.nc{position:absolute;white-space:nowrap;font-weight:900;color:#fff;font-size:28px;left:880px;opacity:.92;
+ text-shadow:-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000,2px 2px 0 #000,0 0 6px #000;will-change:transform}
+.nc.gold{color:#ffd54a;font-size:32px}
+.nc.buzzhl{color:#fff36b;font-size:34px;background:#e1251bcc;padding:0 12px;border-radius:8px;box-shadow:0 0 18px #ffd54a;opacity:1}
+.cheer{margin-top:6px;text-align:left;font-size:11px;color:#ccc;display:flex;align-items:center;gap:3px;white-space:nowrap}
+.cheer .pips{display:flex;gap:1px;margin-left:auto}
+.pip{width:15px;height:16px;font-size:12px;line-height:16px;text-align:center;border-radius:4px;background:#222;border:1px solid #444;filter:grayscale(1);opacity:.35}
+.pip.on{filter:none;opacity:1;background:#1d9bf0;border-color:#7cc8ff}
+.pip.half{filter:none;opacity:1;background:linear-gradient(90deg,#1d9bf0 50%,#222 50%);border-color:#7cc8ff}
+#buzz{position:absolute;left:0;right:0;top:-120px;z-index:18;display:flex;justify-content:center;pointer-events:none;transition:top .35s cubic-bezier(.2,1.5,.4,1)}
+#buzz.show{top:8px}
+#buzz .bb{background:linear-gradient(90deg,#0b5fae,#1d9bf0,#7cc8ff);border:2px solid #fff;border-radius:14px;padding:8px 26px;text-align:center;box-shadow:0 0 30px #1d9bf0aa}
+#buzz .bt{font-size:30px;font-weight:900;color:#fff;text-shadow:0 2px 0 #003}
+#buzz .bs{font-size:13px;font-weight:700;color:#eaf6ff}
+/* overlays */
+#cut{position:absolute;inset:0;z-index:20;display:none;align-items:center;justify-content:center;pointer-events:none}
+#cut .band{position:absolute;left:-60px;right:-60px;height:170px;background:linear-gradient(90deg,#7a0000,#e1251b 40%,#ffb300);transform:skewY(-6deg);box-shadow:0 0 40px #000;animation:band .5s ease-out}
+#cut .ctext{position:relative;margin-left:150px;text-align:center;animation:ctext .6s cubic-bezier(.2,1.6,.4,1)}
+#cut .cwho{font-size:22px;font-weight:900;color:#fff;text-shadow:0 2px 0 #000}
+#cut .cname{font-size:64px;font-weight:900;color:#fff;-webkit-text-stroke:2px #000;text-shadow:0 5px 0 #000,0 0 20px #ff0}
+#cut .cdesc{font-size:18px;font-weight:700;color:#fff8d0;text-shadow:0 2px 0 #000}
+#cut .cav{position:absolute;left:40px;top:50%;width:170px;height:190px;transform:translateY(-50%);animation:cav .5s ease-out}
+@keyframes band{from{transform:skewY(-6deg) scaleY(0)}to{transform:skewY(-6deg) scaleY(1)}}
+@keyframes ctext{from{transform:scale(3);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes cav{from{transform:translate(-300px,-50%)}to{transform:translate(0,-50%)}}
+#endov{position:absolute;inset:0;z-index:15;display:none;align-items:center;justify-content:center;background:#000b}
+#endbox{width:640px;text-align:center;background:linear-gradient(180deg,#1d1a0e,#141417);border:2px solid #ffd54a;border-radius:16px;padding:12px 22px;box-shadow:0 0 50px #ffd54a44}
+#endtitle{font-size:20px;color:#ffd54a;font-weight:900;letter-spacing:4px}
+#endwin{font-size:32px;font-weight:900;margin:2px 0;line-height:1.2}
+#endscore{font-size:19px;font-weight:800;color:#ddd}
+#promo{margin:2px 0;min-height:70px}
+.promo-old{font-size:18px;color:#999;text-decoration:line-through}
+.promo-person{font-size:14px;color:#ccc;margin-bottom:2px}
+.promo-loser{font-size:13px;color:#c9965a;margin-top:6px}
+.promo-arrow{font-size:22px;color:#ffd54a;margin:0 10px}
+.promo-new{font-size:36px;font-weight:900;color:#ffd54a;display:inline-block;animation:promo 1s cubic-bezier(.2,1.8,.4,1);text-shadow:0 0 18px #ffb300}
+.promo-tag{display:inline-block;background:#e1251b;color:#fff;font-weight:900;padding:2px 12px;border-radius:20px;font-size:16px;margin-bottom:6px;animation:promo .6s}
+@keyframes promo{from{transform:scale(0) rotate(-20deg)}to{transform:scale(1) rotate(0)}}
+#stats{display:flex;flex-wrap:wrap;justify-content:space-around;font-size:12.5px;line-height:1.45;color:#ccc;margin:6px 0;border-top:1px solid #333;padding-top:6px}
+#stats b{color:#ffd54a}
+.logbtns{display:flex;gap:8px;justify-content:center;margin-top:2px}
+.logbtns button{background:#2a2a30;color:#ddd;border:1px solid #555;border-radius:16px;font-size:13px;padding:4px 14px;cursor:pointer;font-family:inherit}
+#rematch{margin-top:6px;background:#ffd54a;color:#111;border:0;border-radius:24px;font-weight:900;font-size:17px;padding:9px 28px;cursor:pointer;font-family:inherit}
+.conf{position:absolute;width:10px;height:16px;top:-20px;z-index:16;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(800px) rotate(720deg)}}
+#startov{position:absolute;inset:0;z-index:40;background:#000c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+#startbtn{background:#e1251b;color:#fff;border:0;border-radius:40px;font-size:30px;font-weight:900;padding:18px 44px;cursor:pointer;font-family:inherit;box-shadow:0 0 40px #e1251b88}
+#startbtn .pl{margin-right:12px}
+#startov .sub{color:#aaa;font-size:14px}
+#mute{background:#222;border:1px solid #444;color:#eee;border-radius:8px;font-size:18px;padding:3px 10px;cursor:pointer}
+.lv{background:#e1251b;color:#fff;font-size:10px;font-weight:900;padding:1px 5px;border-radius:4px;margin-right:5px;vertical-align:1px}
+.m.real{background:#e1251b14;border-left:2px solid #e1251b;border-radius:4px}
+.m.sys{background:#ffffff0a;border-left:2px solid #666;border-radius:4px;color:#bbb;font-size:12px}
+.m.sys .stag{display:inline-block;font-size:10px;font-weight:700;color:#111;background:#9aa;border-radius:3px;padding:0 4px;margin-right:6px}
+.m.human .nm{color:#fff!important}
+.m.human .htag{display:inline-block;font-size:10px;font-weight:700;color:#fff;background:#3a7bd5;border-radius:3px;padding:0 4px;margin-right:4px}
+#xhint{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:6;background:#000a;color:#ddd;font-size:13px;padding:4px 12px;border-radius:14px;border:1px solid #444;white-space:nowrap;pointer-events:none}
+#relaypill{display:none;font-size:12px;font-weight:800;padding:4px 10px;border-radius:14px;margin-right:8px;white-space:nowrap}
+#relaypill.on{background:#1f9d4a;color:#fff}
+#relaypill.wait{background:#333;color:#aaa}
+#relaypill.err{background:#c62828;color:#fff;animation:pulse .8s infinite alternate}
+#waitpill{display:none;position:absolute;left:50%;bottom:6px;transform:translateX(-50%);z-index:8;background:#000c;border:1px solid #ffd54a;color:#ffd54a;font-size:15px;font-weight:700;padding:4px 16px;border-radius:16px;white-space:nowrap}
+#waitpill b{color:#fff}
+#waitpill .ws{margin-left:6px;color:#fff;font-variant-numeric:tabular-nums}
+#waitpill .wr{margin-left:10px;background:#e1251b;color:#fff;font-size:11px;padding:1px 6px;border-radius:4px}
+/* chat */
+#chat{left:896px;top:68px;width:376px;height:572px;display:flex;flex-direction:column}
+#chathead{padding:12px 16px;font-weight:800;font-size:16px;border-bottom:1px solid #2a2a30;display:flex;justify-content:space-between}
+#chathead span{font-size:12px;color:#888;font-weight:400}
+#msgs{flex:1;overflow:hidden;padding:6px 10px;display:flex;flex-direction:column;justify-content:flex-end;gap:2px}
+.m{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;line-height:1.45;padding:4px 4px;animation:min .25s ease-out}
+@keyframes min{from{opacity:0;transform:translateY(8px)}}
+.m .av{width:26px;height:26px;flex:none}
+.m .body{flex:1}
+.m .nm{font-weight:800;margin-right:6px}
+.m .tm{font-size:11px;color:#777;flex:none;margin-top:2px}
+.sc{margin:5px 2px;border-radius:10px;overflow:hidden;border:1px solid #ffcf3a;animation:min .3s ease-out;flex:none}
+.sc .sch{background:linear-gradient(90deg,#c98a00,#ffb300);color:#1a1200;padding:6px 10px;display:flex;justify-content:space-between;font-weight:900;font-size:13px}
+.sc .scb{background:#2a2108;padding:8px 12px;font-size:17px;font-weight:900;color:#ffd54a}
+.sc .sct{font-size:11px;color:#c9b77a;font-weight:600;margin-top:2px}
+#inbox{margin:8px 10px 10px;display:flex;border:1px solid #333;border-radius:20px;background:#0d0d10;padding:4px 6px 4px 14px}
+#inp{flex:1;background:transparent;border:0;color:#eee;font-size:13px;outline:none;font-family:inherit}
+#send{background:none;border:0;color:#aaa;font-size:18px;cursor:pointer}
+/* bottom */
+#bottom{left:8px;top:648px;width:1264px;height:64px;display:flex;align-items:center;padding:0 16px;gap:14px}
+#bottom .t{font-size:24px;font-weight:900}
+#bottom .h{margin-left:auto;font-size:16px;color:#ffd54a;font-weight:700}
+#bottom .k{font-size:11px;color:#666}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div id="top" class="panel">
+  <div class="live">LIVE</div>
+  <div id="remain">残り 60手</div>
+  <div id="viewers">👁 128人が視聴中</div>
+  <div id="topmid">
+   <div class="tp"><span class="av" id="tav0" style="width:30px;height:30px"></span><span id="tn0">Windows2000課長</span><span class="dot" style="background:#000;border:1px solid #555"></span></div>
+   <div class="cnt" id="tc0">2</div><div class="sep"></div><div class="cnt" id="tc1">2</div>
+   <div class="tp"><span class="dot" style="background:#fff"></span><span id="tn1">意識高井</span><span class="av" id="tav1" style="width:30px;height:30px"></span></div>
+  </div>
+  <div style="width:260px;display:flex;justify-content:flex-end;align-items:center"><span id="relaypill"></span><button id="mute" title="ミュート (M)">🔊</button></div>
+ </div>
+ <div id="game" class="panel">
+  <div class="pcard" id="pc0"><div class="chibi" id="pav0"></div><div class="pname" id="pn0"></div><div class="pstyle" id="ps0"></div><div class="pnum" id="pnum0">2</div><div class="think">考え中…</div>
+   <div class="gauge" id="g0"><div class="glabel"><span>スパチャ</span><span id="gt0">¥0 / ¥10,000</span></div><div class="gbar"><div class="gfill" id="gf0"></div></div></div><div class="cheer"><span>📣 X応援</span><span class="pips" id="ch0"></span></div><div class="sp" id="sp0"></div></div>
+  <div class="pcard" id="pc1"><div class="chibi" id="pav1"></div><div class="pname" id="pn1"></div><div class="pstyle" id="ps1"></div><div class="pnum" id="pnum1">2</div><div class="think">考え中…</div>
+   <div class="gauge" id="g1"><div class="glabel"><span>スパチャ</span><span id="gt1">¥0 / ¥10,000</span></div><div class="gbar"><div class="gfill" id="gf1"></div></div></div><div class="cheer"><span>📣 X応援</span><span class="pips" id="ch1"></span></div><div class="sp" id="sp1"></div></div>
+  <div id="boardwrap"><div id="board"></div></div>
+  <div id="nico"></div><div id="xhint" style="display:none">配信中のコメントが画面に流れます</div>
+  <div id="waitpill"></div>
+  <div id="buzz"><div class="bb"><div class="bt" id="buzzt"></div><div class="bs" id="buzzs"></div></div></div>
+  <div id="cut"><div class="band"></div><div class="cav" id="cutav"></div><div class="ctext"><div class="cwho" id="cutwho"></div><div class="cname" id="cutname"></div><div class="cdesc" id="cutdesc"></div></div></div>
+  <div id="endov"><div id="endbox">
+   <div id="endtitle">GAME SET</div><div id="endavs" style="display:flex;justify-content:center;gap:70px;height:96px;margin:2px 0"></div><div id="endwin"></div><div id="endscore"></div>
+   <div id="promo"></div><div id="stats"></div>
+   <div class="logbtns"><button id="logtxt">📄 ログを保存</button><button id="logjson">JSON</button></div>
+   <button id="rematch">再戦する（<span id="cd">15</span>）</button>
+  </div></div>
+ </div>
+ <div id="chat" class="panel">
+  <div id="chathead">ライブチャット<span>上位チャット ▾</span></div>
+  <div id="msgs"></div>
+  <div id="inbox"><input id="inp" placeholder="メッセージを入力…（画面に流れるよ）" maxlength="40"><button id="send">➤</button></div>
+ </div>
+ <div id="startov"><button id="startbtn"><span class="pl">▶</span>クリックで配信開始</button><div class="sub">音が出ます（M：全ミュート　B：BGMだけON/OFF）</div></div>
+ <div id="bottom" class="panel">
+  <span class="av" id="bav" style="width:40px;height:40px"></span>
+  <span class="t">【生配信】Grok Bot社畜オセロ 〜オラにスパチャを分けてくれ〜</span>
+  <span class="k" id="modek">[1][2] スパチャ [3][4] X応援テスト</span>
+  <span class="h">下の欄からコメントを流せるよ</span>
+ </div>
+</div>
+<script>
+/* ===== 設定 ===== */
+const CONFIG = {
+  /* 役職はしごは共通。ladder[0] がスタート役職。勝つたびに1段昇格（再戦でも持ち越し） */
+  players: [
+    { person:"通称Windows2000", alias:["Windows","ウィンドウズ","2000","窓際族","ガンバ","ハゲタ"], color:"#ff9a6b", costume:"ceo", style:"● 黒・年収2,000万の窓際族",
+      ladder:["課長","部長","本部長","常務","社長","会長"],
+      full:t => t==="課長" ? "窓際族 通称Windows2000" : `${t} 通称Windows2000`,
+      short:t => `Windows2000${t}`,
+      me:["年収分は働いてるよ","まあまあ、焦らずいこう","ここかな。お茶がうまい","{n}枚？まあ年の功だね","若い子は元気だねぇ","定年まで勝っとくか"],
+      win:["年収分の仕事はしたよ","{t}ねぇ…お茶がうまい","まあ、こんなもんだよ"],
+      lose:["まあ年収は変わらんし","お茶でも飲むか","窓際は落ち着くねぇ"] },
+    { person:"意識高井 エビデンス", alias:["高井","エビデンス"], color:"#7fc8ff", costume:"research", style:"○ 白・データ重視のポジショナル",
+      ladder:["平社員","主任","係長","課長","部長","本部長","常務","社長","会長"],
+      full:t => t==="平社員" ? "意識高井 エビデンス" : `${t} 意識高井 エビデンス`,
+      short:t => t==="平社員" ? "意識高井" : `高井${t}`,
+      me:["それ、データあります？","ここが期待値最大です。エビデンスあります","ファクトベースでいきましょう","その手、再現性あります？","角は後でいただきます。データ的に","KPI的にはここですね"],
+      win:["データ通りの結果です","{t}ですか。想定内ですね","エビデンスが勝ちました"],
+      lose:["…サンプル数が少なすぎますね","この負け、再現性あります？","次のスプリントで改善します"] }
+  ],
+  /* 観戦Bot。voice のキーは実況イベント（無いイベントは共通テンプレで喋る） */
+  spectators: [
+    { name:"ゴマ擦造", alias:["ゴマ"], color:"#ff7fb0", costume:"pr", voice:{
+      open:["本日もお二人とも素敵でございます！"],
+      corner:["さすが{p}様！その角、芸術です！","{p}様の{c}、教科書に載せましょう！"],
+      big:["{n}枚！{p}様、器が違いますなぁ！"],
+      lead:["いやぁ最初から{lead}様が勝つと思ってましたよ！","{lead}様、一生ついていきます！"],
+      fill:["{lead}様のリード、拝ませていただきます","{lead}様、肩お揉みしましょうか？","{lead}様の一手一手が勉強になります！"],
+      pass:["{o}様、お見事な封じ込めでございます！"],
+      special:["必殺技まで華麗…！さすがでございます！"],
+      end:["最初から{w}様の勝ちだと信じておりました！"],
+      promo:["{nw}様！！ご昇進おめでとうございます！！（揉み手）"],
+      buzz:["{p}様、ついにバズられましたか！さすがでございます！"] } },
+    { name:"定時ダッシュ帰太郎", alias:["帰太郎","定時"], color:"#9dff9d", costume:"teiji", voice:{
+      open:["定時までに終わりますよね？"],
+      big:["{n}枚返すのはいいけど早くして"],
+      fill:["今{time}…あと何手？","17:59に終わらせてくれ頼む","カバンはもう持ってます","{r}手もあるの…？","PC閉じていいですか"],
+      pass:["パスでいいからテンポよく！"],
+      endg:["残り{r}手！定時見えた！"],
+      special:["必殺技いらないから早く打って"],
+      end:["終わった！お先に失礼しまーす！"],
+      promo:["昇格おめでとうございます。では定時なので"],
+      buzz:["バズってもいいから早く打って"] } },
+    { name:"残業マン徹夜", alias:["残業マン","徹夜"], color:"#ffb347", costume:"zangyo", voice:{
+      open:["今夜は寝かせねえぞ…！！"],
+      corner:["{c}ッ！！！燃えてきたァ！！"],
+      big:["{n}枚返しィ！！！これだよこれ！！"],
+      lead:["逆転！！！今夜は眠れねえ！！"],
+      xsq:["そこに打つか…！その覚悟、嫌いじゃない！！"],
+      fill:["まだまだ終わらせねえ…延長戦だ…","3徹目だけど目が冴えてきた","エナドリ5本目いきます"],
+      endg:["残り{r}手…ここからが本当の残業だ…！"],
+      special:["必殺技ッ！！！最高かよ！！！"],
+      end:["もう1局！朝までやろう！！"],
+      promo:["昇格！？俺も残業して昇格するぞォ！！"],
+      buzz:["バズったァ！！！{p}、燃えてるぜ！！"] } },
+    { name:"窓際の生き字引 古株さん", short:"古株さん", alias:["古株"], color:"#c9a7ff", costume:"furukabu", voice:{
+      open:["昔はな…この会議室でよく勝負したもんじゃ"],
+      corner:["昔はな…角を取ったら定食1品おまけだったんじゃ"],
+      big:["昔はな…{n}枚返したら課長になれたもんじゃ"],
+      lead:["昔はな…逆転は始末書ものじゃった"],
+      xsq:["昔はな…角のとなりに打ったら左遷じゃった"],
+      fill:["昔はな…オセロは紙と鉛筆でやっとった","昔はな…あそこに打つ若者はおらんかった","昔はな…データなんて無かったんじゃ"],
+      pass:["昔はな…パスは3回まで許されたんじゃ"],
+      special:["昔はな…必殺技は接待麻雀だけじゃった"],
+      end:["昔はな…負けた方が奢ったもんじゃ"],
+      promo:["昔はな…昇格したら赤飯炊いたもんじゃ"],
+      buzz:["昔はな…バズるといえば社内報の4コマだったんじゃ"] } }
+  ],
+  gaugeMax: 10000,
+  commentsUrl: "comments.json",
+  pollMs: 15000,
+  restartSec: 15,
+  boardSize: 6,      /* 6 or 8（URLの ?board=8 で上書き） */
+  volume: 0.35
+};
+/* ドット絵キャラ（透過PNG・埋め込み）。scale は整数倍で表示 */
+const SPRITES = [
+  { src:"data:image/png;base64,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", w:67, h:65, scale:2 },   /* 黒：通称Windows2000（上半身） */
+  { src:"data:image/png;base64,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", w:57, h:79, scale:2 }    /* 白：意識高井 */
+];
+/* 必殺技（名前・説明は自由に編集OK。id は効果の種類） */
+const SPECIAL_MOVES = [
+  { id:"keihi",   name:"秘技・ゴマスリ地獄",       desc:"相手の石が2〜3枚、ゴマをすられて寝返る！" },
+  { id:"kaigi",   name:"接待ゴルフ招待",           desc:"相手はゴルフ場へ。次の手番はお休み" },
+  { id:"kado",    name:"角部屋の忖度予約",         desc:"空いてる角を3手のあいだ予約済みに" },
+  { id:"tobashi", name:"飛ばし人事",               desc:"相手の石1〜2枚を盤外へ異動！" },
+  { id:"nomi",    name:"飲みニケーション強制参加", desc:"二日酔いで相手の次の一手はランダム" }
+];
+/* comments.json が読めない時（file://）用の初期データ。comments.json と同じサンプル */
+const SEED_COMMENTS = /*SEED_START*/[{"id": "sample-01", "text": "配信きた！オセロ実況たのしみ"}, {"id": "sample-02", "text": "Windows2000課長がんばれ"}, {"id": "sample-03", "text": "高井のエビデンス最強"}, {"id": "sample-04", "text": "黒優勢？まだわからん"}, {"id": "sample-05", "text": "白の角取りうまい"}, {"id": "sample-06", "text": "スパチャ投げたい"}, {"id": "sample-07", "text": "定時までに終わってほしい"}, {"id": "sample-08", "text": "必殺技見たい！"}, {"id": "sample-09", "text": "データ通りの一手だ"}, {"id": "sample-10", "text": "窓際族なのに強い"}, {"id": "sample-11", "text": "この配信おもしろすぎる"}, {"id": "sample-12", "text": "お茶がうまそう"}, {"id": "sample-13", "text": "残業マンが燃えてる"}, {"id": "sample-14", "text": "ゴマ擦造のコメント好き"}, {"id": "sample-15", "text": "再戦希望！"}, {"id": "sample-16", "text": "社畜オセロ、仕事より楽しい"}, {"id": "sample-17", "text": "黒に全額！"}, {"id": "sample-18", "text": "白のポジション読みが鋭い"}, {"id": "sample-19", "text": "角取ったの熱い"}, {"id": "sample-20", "text": "コメント流れてるの好き"}]/*SEED_END*/;
+
+const Q = new URLSearchParams(location.search);
+const FAST = Q.has("fast");
+const SPEED = FAST ? 0.08 : 1;
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms * SPEED));
+const rnd = a => a[Math.floor(Math.random() * a.length)];
+const yen = n => "¥" + n.toLocaleString("ja-JP");
+
+/* ===== 効果音（Web Audio API、音声ファイルなし） ===== */
+const SND = (()=>{
+  let ac=null, master=null, muted=false, lastTick=0;
+  function init(){ if(ac) { ac.resume(); return; } const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+    ac=new AC(); master=ac.createGain(); master.gain.value=muted?0:CONFIG.volume; master.connect(ac.destination); }
+  const ok=()=>ac && ac.state==="running" && !muted;
+  function tone(f, dur, type="sine", vol=.3, at=0, f2=null, attack=.005){
+    if(!ok()) return; const t=ac.currentTime+at, o=ac.createOscillator(), g=ac.createGain();
+    o.type=type; o.frequency.setValueAtTime(f,t); if(f2) o.frequency.exponentialRampToValueAtTime(f2,t+dur);
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+attack); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t+dur+.05); return o; }
+  function noise(dur, vol=.3, at=0, ftype="highpass", f=1000, f2=null){
+    if(!ok()) return; const t=ac.currentTime+at, n=Math.floor(ac.sampleRate*dur), buf=ac.createBuffer(1,n,ac.sampleRate), d=buf.getChannelData(0);
+    for(let i=0;i<n;i++) d[i]=Math.random()*2-1;
+    const src=ac.createBufferSource(); src.buffer=buf; const fl=ac.createBiquadFilter(); fl.type=ftype; fl.frequency.setValueAtTime(f,t); if(f2) fl.frequency.exponentialRampToValueAtTime(f2,t+dur);
+    const g=ac.createGain(); g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    src.connect(fl); fl.connect(g); g.connect(master); src.start(t); src.stop(t+dur+.05); }
+  /* ===== 8bit BGM（矩形波メロディ＋三角波ベース＋ノイズドラム、約150BPM） ===== */
+  const NT=n=>{ if(!n||n===".") return 0; const m=n.match(/^([A-G])(#?)(\d)$/); const k={C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]]+(m[2]?1:0); return 440*Math.pow(2,((+m[3]+1)*12+k-69)/12); };
+  const LEAD="A4 C5 E5 A5 G5 E5 D5 E5 F5 E5 D5 C5 D5 E5 C5 A4 G4 B4 D5 G5 F5 D5 B4 D5 E5 . E5 G#5 B5 A5 G#5 E5".split(" ").map(NT);
+  const LEAD2="A5 E5 A5 C6 B5 G5 E5 G5 F5 A5 C6 A5 G5 E5 C5 E5 G5 B5 D6 B5 A5 F5 D5 F5 E5 G#5 B5 E6 D6 B5 G#5 B5".split(" ").map(NT);
+  const ROOT=["A2","F2","G2","E2"].map(NT);
+  let bg=null, bgOn=true, bgPlaying=false, step=0, nextT=0, timer=null, intense=false, BGV=.22;
+  function bnote(f,t,d,type,v){ if(!f) return; const o=ac.createOscillator(), g=ac.createGain(); o.type=type; o.frequency.setValueAtTime(f,t);
+    g.gain.setValueAtTime(v,t); g.gain.setValueAtTime(v,t+d*.75); g.gain.linearRampToValueAtTime(.0001,t+d); o.connect(g); g.connect(bg); o.start(t); o.stop(t+d+.02); }
+  let nbuf=null;
+  function bnoise(t,d,v,hp){ if(!nbuf){ nbuf=ac.createBuffer(1,ac.sampleRate*.3,ac.sampleRate); const x=nbuf.getChannelData(0); for(let i=0;i<x.length;i++) x[i]=Math.random()*2-1; }
+    const s=ac.createBufferSource(); s.buffer=nbuf; const f=ac.createBiquadFilter(); f.type="highpass"; f.frequency.value=hp; const g=ac.createGain();
+    g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(.0001,t+d); s.connect(f); f.connect(g); g.connect(bg); s.start(t); s.stop(t+d+.02); }
+  function playStep(i,t,sd){ /* i: 0..63 の16分音符 */
+    const bar=Math.floor(i/16), s16=i%16, mel=intense?LEAD2:LEAD;
+    if(i%2===0) bnote(mel[i/2], t, sd*(mel[i/2+1]===0?3.6:1.8), "square", .07);
+    const r=ROOT[bar]; if(i%2===0) bnote(r*((i/2)%2?2:1), t, sd*1.6, "triangle", .2);
+    if(s16===0||s16===8||(intense&&(s16===10||s16===14))){ const o=ac.createOscillator(), g=ac.createGain(); o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(40,t+.12); g.gain.setValueAtTime(.35,t); g.gain.exponentialRampToValueAtTime(.0001,t+.14); o.connect(g); g.connect(bg); o.start(t); o.stop(t+.16); }
+    if(s16===4||s16===12) bnoise(t,.12,.18,1500);
+    if(intense || i%2===0) bnoise(t,.03,.06,7000);
+  }
+  function sched(){ if(!ac||ac.state!=="running") return; const sd=60/(intense?168:150)/4;
+    if(nextT<ac.currentTime) nextT=ac.currentTime+.05;
+    while(nextT<ac.currentTime+.15){ playStep(step,nextT,sd); nextT+=sd; step=(step+1)%64; } }
+  function bgmStart(){ if(!ac) return; if(!bg){ bg=ac.createGain(); bg.connect(master); } bg.gain.cancelScheduledValues(ac.currentTime); bg.gain.setValueAtTime(bgOn?BGV:0,ac.currentTime);
+    bgPlaying=true; step=0; nextT=0; intense=false; if(!timer) timer=setInterval(()=>{ if(bgPlaying) sched(); },30); }
+  function bgmStop(){ bgPlaying=false; if(bg) bg.gain.setTargetAtTime(0,ac.currentTime,.05); }
+  return {
+    bgmStart, bgmStop,
+    bgmIntense(on){ intense=!!on; },
+    bgmDuck(ms){ if(!bg||!bgOn) return; const t=ac.currentTime; bg.gain.cancelScheduledValues(t); bg.gain.setTargetAtTime(BGV*.15,t,.04); bg.gain.setTargetAtTime(BGV,t+ms/1000,.2); },
+    bgmToggle(){ bgOn=!bgOn; if(bg) bg.gain.setTargetAtTime(bgOn&&bgPlaying?BGV:0,ac.currentTime,.05); return bgOn; },
+    init, get muted(){return muted;},
+    toggle(){ muted=!muted; if(master) master.gain.value=muted?0:CONFIG.volume; return muted; },
+    place(){ noise(.05,.5,0,"highpass",2500); tone(1500,.04,"square",.12); tone(180,.06,"sine",.3); },
+    tick(){ const n=performance.now(); if(n-lastTick<35) return; lastTick=n; tone(2200+Math.random()*400,.03,"triangle",.07); },
+    pass(){ tone(140,.25,"square",.15); tone(110,.35,"square",.15,.28); },
+    coin(){ tone(1319,.09,"square",.12); tone(1976,.5,"triangle",.18,.08); tone(2637,.4,"sine",.08,.1); },
+    full(){ [880,1109,1319,1760,2217].forEach((f,i)=>tone(f,.12,"square",.1,i*.06)); },
+    special(){ noise(.55,.35,0,"bandpass",300,4000); tone(90,.9,"sawtooth",.35,.5,35); noise(.5,.6,.5,"lowpass",900); tone(55,1.0,"sine",.6,.5,30); [523,659,784].forEach(f=>tone(f,.6,"sawtooth",.07,.55)); },
+    buzz(){ [523,659,784,1047,1319,1568].forEach((f,i)=>tone(f,.14,"triangle",.14,i*.05)); tone(1976,.5,"sine",.12,.32); noise(.25,.15,.3,"highpass",4000); },
+    corner(){ tone(659,.12,"triangle",.2); tone(988,.35,"triangle",.22,.1); tone(1319,.3,"sine",.1,.1); },
+    gong(){ [[98,1],[196,.6],[262,.35],[392,.25],[523,.15]].forEach(([f,v])=>tone(f,3.0,"sine",.45*v,0,f*.98,.01)); noise(.3,.2,0,"lowpass",600); },
+    fanfare(){ const N=[[523,.15],[659,.15],[784,.15],[1047,.45],[784,.15],[1047,.9]]; let t=0; N.forEach(([f,d])=>{ tone(f,d+.1,"square",.09,t); tone(f/2,d+.1,"triangle",.12,t); t+=d; }); },
+    sad(){ if(!ok()) return; const notes=[392,370,349]; notes.forEach((f,i)=>tone(f,.45,"sawtooth",.12,i*.5,f*.97,.03));
+      const t=ac.currentTime+1.5, o=ac.createOscillator(), g=ac.createGain(), lfo=ac.createOscillator(), lg=ac.createGain(), fl=ac.createBiquadFilter();
+      o.type="sawtooth"; o.frequency.setValueAtTime(330,t); o.frequency.linearRampToValueAtTime(300,t+1.3); lfo.frequency.value=6; lg.gain.value=8; lfo.connect(lg); lg.connect(o.frequency);
+      fl.type="lowpass"; fl.frequency.value=1200; g.gain.setValueAtTime(.0001,t); g.gain.linearRampToValueAtTime(.14,t+.05); g.gain.exponentialRampToValueAtTime(.0001,t+1.4);
+      o.connect(fl); fl.connect(g); g.connect(master); o.start(t); lfo.start(t); o.stop(t+1.5); lfo.stop(t+1.5); }
+  };
+})();
+
+/* ===== 本物Bot実況リレー（?relay=<topic> のときだけON。トピックは埋め込まない） ===== */
+const RELAY = (()=>{
+  const raw=Q.get("relay")||""; const topic=/^[A-Za-z0-9_-]{6,64}$/.test(raw)?raw:null;
+  const rh=Q.get("relayhost")||""; const HOST=/^[A-Za-z0-9.-]{3,100}$/.test(rh)?rh:"ntfy.envs.net";
+  const BASE=`https://${HOST}`;
+  let es=null, lastSent=0, lastReal=0, onSay=null, onX=null, onMove=null, queued=null, qTimer=null, state=null, errSince=0, lastId="", pollTimer=null;
+  const st={sent:0, sendFail:0, recv:0, dropped:0};
+  function pill(s){ state=s||state; const el=$("relaypill"); if(!el||!topic) return; el.style.display="inline-block";
+    el.className = state;
+    el.textContent = state==="on" ? "● 本物Bot実況 ON" : state==="err" ? "✕ 実況サーバーに接続できない" : "本物Bot実況 接続中…";
+    el.title = `中継: ${HOST} ／ 送信 ${st.sent}件（失敗 ${st.sendFail}・間引き ${st.dropped}） ／ 受信 ${st.recv}件`; }
+  function handle(d){
+    if(!d || d.event!=="message") return; if(d.id) lastId=d.id;
+    if(d.topic===`${topic}-mvr`){ try{ const j=JSON.parse(d.message); st.recv++; onMove && onMove(j); }catch(e){} return; }
+    if(d.topic===`${topic}-x`){ try{ const j=JSON.parse(d.message);
+      let text=String(j.text||"").replace(/https?:\/\/\S+/g,"").replace(/@\w+/g,"").replace(/[\u0000-\u001f]/g," ").trim().slice(0,40);
+      const id=String(j.id||d.id).replace(/[^\w-]/g,"").slice(0,40); if(text && id){ st.recv++; onX({id,text}); } }catch(e){} return; }
+    let who="Bot", text=d.message||"", sc=0, tg=null;
+    try{ const j=JSON.parse(d.message); who=j.who||who; text=j.text||""; sc=Math.floor(+j.superchat||0); tg=j.target||null; }catch(e){}
+    who=String(who).replace(/[\u0000-\u001f]/g,"").slice(0,20); text=String(text).replace(/[\u0000-\u001f]/g," ").trim().slice(0,60);
+    if(!text) return; st.recv++; lastReal=Date.now(); pill("on"); onSay(who,text,sc>0?Math.min(10000,Math.max(100,sc)):0,tg);
+  }
+  const topics=()=>`${topic}-say,${topic}-x,${topic}-mvr`;
+  function connect(){
+    try{ es && es.close(); }catch(e){}
+    es=new EventSource(`${BASE}/${topics()}/sse${lastId?`?since=${lastId}`:""}`);
+    es.onopen=()=>{ errSince=0; stopPoll(); pill("on"); };
+    es.onerror=()=>{ if(!errSince) errSince=Date.now();
+      setTimeout(()=>{ if(errSince && Date.now()-errSince>=3500) pill("err"); },4000);
+      if(es.readyState===2) setTimeout(connect,5000);           /* 閉じたら5秒後に再接続 */
+      if(Date.now()-errSince>15000) startPoll(); };             /* SSEがダメなら低頻度ポーリング */
+    es.onmessage=(m)=>{ try{ handle(JSON.parse(m.data)); }catch(e){} };
+  }
+  async function pollOnce(){
+    try{ const r=await fetch(`${BASE}/${topics()}/json?poll=1&since=${lastId||"30s"}`,{cache:"no-store"}); if(!r.ok) throw 0;
+      const t=await r.text(); pill("on");
+      t.split("\n").filter(Boolean).forEach(l=>{ try{ handle(JSON.parse(l)); }catch(e){} });
+    }catch(e){ pill("err"); }
+  }
+  function startPoll(){ if(pollTimer) return; pollOnce(); pollTimer=setInterval(pollOnce,8000); }  /* 8秒ごと（envs.netの制限内） */
+  function stopPoll(){ if(pollTimer){ clearInterval(pollTimer); pollTimer=null; } }
+  function init(chatFn, xFn, moveFn){ if(!topic) return; onSay=chatFn; onX=xFn; onMove=moveFn; pill("wait"); connect(); }
+  /* 観戦Bot向けイベント：5秒に1件まで。間に合わない分は「一番大事な最新の1件」を待たせて送る */
+  const PRI={end:9,game_start:9,special:5,corner:5,buzz:4,superchat:4,lead_change:3,big_flip:3,pass:3,progress:1};
+  function post(suffix, ev){ ev.ts=Date.now(); fetch(`${BASE}/${topic}-${suffix}`,{method:"POST",body:JSON.stringify(ev)})
+      .then(r=>{ if(r.ok) st.sent++; else st.sendFail++; pill(); }).catch(()=>{ st.sendFail++; pill(); }); }
+  function send(ev, force){
+    if(!topic) return; const now=Date.now();
+    if(force || now-lastSent>=5000){ if(ev.type==="end"){ queued=null; } lastSent=now; post("ev",ev); return; }
+    if(!queued || (PRI[ev.type]||1) >= (PRI[queued.type]||1)){ if(queued) st.dropped++; queued=ev; } else st.dropped++;
+    pill();
+    if(!qTimer) qTimer=setTimeout(()=>{ qTimer=null; const q=queued; queued=null; if(q){ lastSent=Date.now(); post("ev",q); } }, Math.max(50,lastSent+5000-now));
+  }
+  function publish(suffix, obj){ if(topic) post(suffix, obj); }   /* 対戦Bot向け（間引きなし） */
+  return { get on(){return !!topic;}, init, send, publish, realActive:()=>Date.now()-lastReal<60000, stats:st };
+})();
+/* ===== 本物だけモード：?relay= のとき既定ON（?demo=1 で従来の演出つき） ===== */
+const REALONLY = RELAY.on && !Q.has("demo");
+const RS = { speakers:new Set(), live:0, sc:0, scYen:0, x:0 };   /* 配信全体の本物カウント */
+function realCounts(){ if(!REALONLY) return; $("viewers").textContent=`本物Bot ${RS.speakers.size}体・コメ${RS.live}・X ${RS.x}`; $("viewers").title=`本物Bot ${RS.speakers.size}体 ／ 受信コメント ${RS.live}件 ／ ライブX投稿 ${RS.x}件`; }
+function relayEv(type, summary, extra, force){
+  if(!RELAY.on) return;
+  const c0=count(S.b,0), c1=count(S.b,1);
+  RELAY.send(Object.assign({ type, move:S.moveNo,
+    players:[{color:"黒",name:name(0),title:title(0),discs:c0},{color:"白",name:name(1),title:title(1),discs:c1}],
+    score:`${c0}-${c1}`, summary }, extra||{}), force);
+}
+/* ===== 本物Bot対戦モード（?relay= のとき既定ON、?players=ai で従来AI） ===== */
+const REALPLAY = RELAY.on && Q.get("players")!=="ai";
+const MOVE_TIMEOUT = 45000;
+let PENDING_MOVE=null;
+function asciiBoard(){ const rows=[]; for(let r=0;r<N;r++){ let t=""; for(let c=0;c<N;c++){ const v=S.b[r*N+c]; t+= v===0?"X":v===1?"O":"."; } rows.push(t); } return rows; }
+function waitUI(p, secs){ const el=$("waitpill");
+  if(p==null){ el.style.display="none"; document.querySelectorAll(".think").forEach(t=>t.textContent="考え中…"); return; }
+  el.style.display="block"; el.innerHTML=`🤔 <b>${esc(name(p))}</b> が考え中… <span class="ws">${secs}秒</span><span class="wr">本物Bot</span>`;
+  const t=$("pc"+p).querySelector(".think"); if(t) t.textContent=`考え中… ${secs}秒`; }
+function askBot(p, moves, gen){
+  const color=p?"white":"black", moveNo=S.moveNo+1, c0=count(S.b,0), c1=count(S.b,1);
+  const list=moves.map((mv,k)=>({id:k+1,label:place(mv.i),flips:mv.f.length}));
+  const effects=[];
+  if(S.resv && S.resv.against===p) effects.push(`角部屋予約：${place(S.resv.i)}は予約済みで打てない（あと${S.resv.left}手）`);
+  if(S.buzzNext[p]) effects.push("バズり昇給中：この一手で1枚多く返せる");
+  if(S.pending[1-p]) effects.push("相手の必殺技ゲージが満タン");
+  RELAY.publish(`mv-${color}`, { type:"your_turn", move:moveNo, color, you:name(p), opponent:name(1-p),
+    board:asciiBoard(), legend:"X=黒 O=白 .=空き（1行目が盤の上側）", moves:list,
+    score:{black:c0, white:c1}, opponent_last:S.lastDesc||"まだなし", effects, time_limit_s:MOVE_TIMEOUT/1000 });
+  return new Promise(res=>{
+    let done=false; const t0=Date.now(); waitUI(p,0);
+    const tick=setInterval(()=>{ if(gen!==S.gen) return finish(null); waitUI(p, Math.floor((Date.now()-t0)/1000)); },500);
+    const to=setTimeout(()=>{ S.timeouts[p]++; factChat(`時間切れ！${name(p)}の手は 代打ち（ページのAI）が打ちます`,0); finish(chooseMove(p,moves)); }, MOVE_TIMEOUT);
+    PENDING_MOVE={ handle(j){
+      if(!j || j.color!==color) return; if(j.move!=null && +j.move!==moveNo) return;
+      const k=Math.floor(+j.move_id); if(!(k>=1 && k<=moves.length)) return;
+      const line=String(j.line||"").replace(/https?:\/\/\S+/g,"").replace(/[\u0000-\u001f]/g," ").trim().slice(0,40);
+      finish(moves[k-1], line, true); } };
+    function finish(mv, line, fromBot){ if(done) return; done=true; clearInterval(tick); clearTimeout(to); PENDING_MOVE=null; waitUI(null);
+      if(mv && fromBot){ RS.speakers.add(name(p)); S.real.botMoves[p]++; realCounts(); }
+      if(line){ chat(name(p), line, CONFIG.players[p].color, CONFIG.players[p].costume, true); }
+      res(mv || chooseMove(p,moves)); }
+  });
+}
+function onBotMove(j){ if(PENDING_MOVE) PENDING_MOVE.handle(j); }
+
+/* 本物Botの名前 → 衣装 */
+function realSpeaker(who){
+  for(const sp of CONFIG.spectators){ const keys=[sp.name, sp.short, ...(sp.alias||[])].filter(Boolean); if(keys.some(k=>who.includes(k)||k.includes(who))) return {name:sp.short||sp.name,color:sp.color,costume:sp.costume}; }
+  for(const [i,pl] of CONFIG.players.entries()){ const keys=[pl.person, name(i), ...(pl.alias||[])]; if(keys.some(k=>who.includes(k)||k.includes(who))) return {name:name(i),color:pl.color,costume:pl.costume}; }
+  return {name:who,color:"#ddd",costume:null};
+}
+function realChat(who,text,sc,tg){ const s=realSpeaker(who); RS.speakers.add(s.name); if(sc){ RS.sc++; RS.scYen+=sc; S.real.sc++; S.real.scYen+=sc; } realCounts();
+  if(sc){ const t = tg!=null ? (/白|高井|エビデンス|1/.test(String(tg)) ? 1 : 0) : RE_WHITE.test(text) ? 1 : RE_BLACK.test(text) ? 0 : null;   /* 宛先なしはゲージに入れない */
+    superChat(`LIVE ${s.name}`, text, sc, t); }
+  else chat(s.name,text,s.color,s.costume,true); }
+
+/* ===== スケーリング ===== */
+function fit(){ const s=Math.min(innerWidth/1280, innerHeight/720); $("stage").style.transform=`translate(-50%,-50%) scale(${s})`; }
+addEventListener("resize", fit); fit();
+
+/* ===== Grok Bot風の顔（黒丸＋右上の斜めカプセル目） ===== */
+function faceSVG(state="normal", ring){
+  const R=48, cx=50, cy=50;
+  const eye=(dx,dy,w,h)=>`<rect x="${cx+dx-w/2}" y="${cy+dy-h/2}" width="${w}" height="${h}" rx="${w/2}" fill="#fff" transform="rotate(-28 ${cx+dx} ${cy+dy})"/>`;
+  let eyes;
+  if(state==="think") eyes=eye(.20*R,-.56*R,.14*R,.36*R)+eye(.55*R,-.60*R,.12*R,.33*R)+[0,1,2].map(i=>`<circle cx="${cx-.57*R+i*.17*R}" cy="${cy+.38*R}" r="${.05*R}" fill="#fff"/>`).join("");
+  else if(state==="happy") eyes=`<path d="M${cx+.17*R} ${cy-.45*R} q${.1*R} ${-.2*R} ${.2*R} 0 M${cx+.5*R} ${cy-.5*R} q${.1*R} ${-.2*R} ${.2*R} 0" stroke="#fff" stroke-width="${.085*R}" fill="none" stroke-linecap="round"/>`;
+  else eyes=eye(.25*R,-.50*R,.14*R,.30*R)+eye(.59*R,-.54*R,.12*R,.28*R);
+  return `<svg viewBox="0 0 100 100"><circle cx="${cx}" cy="${cy}" r="${R}" fill="#050505" ${ring?`stroke="${ring}" stroke-width="3"`:""}/>${eyes}</svg>`;
+}
+/* サラリーマン衣装（同じ顔の上に重ねる） */
+const TIE=(c1,c2)=>`<path d="M40 88 L50 80 L60 88 Z" fill="#fff"/><path d="M46 86 L54 86 L52 92 L57 112 L50 118 L43 112 L48 92 Z" fill="${c1}" stroke="#000" stroke-width="1"/>${c2?`<path d="M45 100 L55 97 M44 107 L56 104" stroke="${c2}" stroke-width="3"/>`:""}`;
+const COSTUME = {
+  ceo: { back:"", front:`<ellipse cx="32" cy="18" rx="13" ry="6" fill="#fff" opacity=".32" transform="rotate(-30 32 18)"/><ellipse cx="26" cy="26" rx="4" ry="2" fill="#fff" opacity=".25" transform="rotate(-30 26 26)"/>
+    <path d="M56 44 Q63 38 70 43 Q77 37 84 42 Q78 50 70 46 Q62 51 56 44 Z" fill="#ddd"/>
+    <path d="M70 72 L92 72 L90 94 Q81 99 72 94 Z" fill="#3c6e47" stroke="#000"/><path d="M76 68 q2 -6 0 -10 M84 68 q2 -6 0 -10" stroke="#bbb" stroke-width="1.6" fill="none"/>`+TIE("#d6202a") },
+  research: { back:"", front:`<g stroke="#e8e8e8" stroke-width="2.4" fill="#ffffff18"><circle cx="61" cy="27" r="9"/><circle cx="80" cy="24" r="8.5"/></g>
+    <path d="M70 26 L71.5 25" stroke="#e8e8e8" stroke-width="2.4"/><path d="M52 28 L36 30" stroke="#e8e8e8" stroke-width="2"/>`+TIE("#2457c5") },
+  pr: { back:"", front:`<path d="M8 40 Q14 0 60 -2 Q92 0 96 26 Q80 6 52 8 Q24 12 8 40 Z" fill="#3a3a3a" stroke="#777" stroke-width="1.5"/>
+    <path d="M26 14 Q50 0 78 6" stroke="#cfcfcf" stroke-width="2" fill="none" opacity=".8"/>`+TIE("#ff2fa0","#ffe600") },
+  lp: { back:`<path d="M12 22 L-4 14 M12 24 L-2 34" stroke="#fff" stroke-width="5" stroke-linecap="round"/>`,
+    front:`<path d="M8 26 Q50 2 96 14" stroke="#fff" stroke-width="8" fill="none"/><circle cx="44" cy="12" r="4.5" fill="#e1251b"/>` },
+  report: { back:"", front:`<path d="M6 44 Q6 2 52 2 Q94 2 98 40 Q90 18 62 12 L58 20 L54 12 Q24 14 6 44 Z" fill="#2c2c2c" stroke="#666" stroke-width="1.5"/>
+    <path d="M58 20 L54 12" stroke="#999" stroke-width="1.5"/>
+    <g transform="rotate(-10 18 82)"><rect x="2" y="66" width="30" height="38" rx="3" fill="#b07a3a" stroke="#000"/><rect x="6" y="72" width="22" height="28" fill="#fff"/><rect x="11" y="62" width="12" height="7" rx="2" fill="#888"/><path d="M9 79h16M9 85h16M9 91h11" stroke="#888" stroke-width="2"/></g>` },
+  teiji: { back:"", front:`<g transform="rotate(-8 22 92)"><rect x="2" y="80" width="40" height="28" rx="4" fill="#5a3a1a" stroke="#000"/><path d="M14 80 Q22 70 30 80" stroke="#3a2510" stroke-width="4" fill="none"/><rect x="19" y="90" width="6" height="5" fill="#d4af37"/></g>
+    <path d="M90 34 Q96 44 90 48 Q84 44 90 34 Z" fill="#7fd0ff"/><circle cx="84" cy="70" r="9" fill="#fff" stroke="#888" stroke-width="2"/><path d="M84 64 L84 70 L88 72" stroke="#000" stroke-width="1.8" fill="none"/>` },
+  zangyo: { back:`<path d="M12 22 L-4 14 M12 24 L-2 34" stroke="#fff" stroke-width="5" stroke-linecap="round"/>`,
+    front:`<path d="M8 26 Q50 2 96 14" stroke="#fff" stroke-width="8" fill="none"/><circle cx="44" cy="12" r="4.5" fill="#e1251b"/>
+    <g stroke="#ff3b3b" stroke-width="1.6" fill="none"><path d="M52 34 l-6 4 M54 37 l-4 6 M72 31 l8 2 M71 35 l6 5"/></g>
+    <path d="M40 66 q6 -3 12 0 q6 3 12 0" stroke="#555" stroke-width="2" fill="none"/><rect x="70" y="72" width="12" height="24" rx="3" fill="#25c25a" stroke="#000"/><text x="76" y="88" font-size="7" font-weight="900" fill="#fff" text-anchor="middle">E</text>` },
+  furukabu: { back:"", front:`<path d="M16 26 Q22 14 30 12 M22 30 Q28 16 36 12" stroke="#cfcfcf" stroke-width="2.4" fill="none"/>
+    <path d="M52 15 L66 12 M70 10 L84 9" stroke="#e8e8e8" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M64 70 L86 70 L84 92 Q75 97 66 92 Z" fill="#3c6e47" stroke="#000"/><path d="M70 66 q2 -6 0 -10 M78 66 q2 -6 0 -10" stroke="#bbb" stroke-width="1.6" fill="none"/><text x="75" y="85" font-size="9" fill="#fff" text-anchor="middle">茶</text>` },
+  designer: { back:"", front:`<ellipse cx="44" cy="6" rx="38" ry="12" fill="#7b3fe4" stroke="#000" stroke-width="1.5" transform="rotate(-12 44 6)"/><path d="M44 -6 L46 -12" stroke="#7b3fe4" stroke-width="4" stroke-linecap="round"/>` }
+};
+const EXTRA = {
+  crown: `<path d="M24 0 L30 -14 L40 -4 L50 -18 L60 -4 L70 -14 L76 0 Z" fill="#ffd54a" stroke="#8a6400" stroke-width="1.5"/><circle cx="50" cy="-8" r="3" fill="#e1251b"/>`,
+  sash: `<path d="M4 30 L100 96 L90 114 L-6 48 Z" fill="#e1251b" stroke="#ffd54a" stroke-width="2"/><text x="47" y="78" font-size="21" font-weight="900" fill="#fff" stroke="#000" stroke-width=".7" transform="rotate(34 47 72)" text-anchor="middle">昇格！！</text>`,
+  box: `<path d="M-2 62 L102 62 L98 112 L2 112 Z" fill="#c9965a" stroke="#6b4a22" stroke-width="2"/><path d="M-2 62 L-10 50 M102 62 L110 50" stroke="#6b4a22" stroke-width="3"/><text x="50" y="94" font-size="20" font-weight="900" fill="#5a3a12" text-anchor="middle">窓際</text>`
+};
+function avatarSVG(costume, state="normal", ring, extra){
+  const inner = faceSVG(state, ring).replace(/^<svg[^>]*>|<\/svg>$/g,"");
+  const c = COSTUME[costume] || {back:"",front:""};
+  return `<svg viewBox="-12 -20 124 136">${c.back}${inner}${c.front}${extra?EXTRA[extra]||"":""}</svg>`;
+}
+const WHITE_SVG = `<svg viewBox="0 0 100 100"><defs><radialGradient id="wg" cx="40%" cy="35%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#d9d9d9"/></radialGradient></defs><circle cx="50" cy="50" r="48" fill="url(#wg)"/></svg>`;
+const BLACK_SVG = faceSVG();
+
+/* ===== オセロ ===== */
+const DIRS=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+const N = (q=>q===8||q===6?q:CONFIG.boardSize)(+Q.get("board")), NN=N*N;
+const CORNERS=[0,N-1,NN-N,NN-1];
+const XSQ=[N+1,2*N-2,NN-2*N+1,NN-N-2];                 /* 角のななめ隣（対応する角と同じ順） */
+const CSQ=[[1,N],[N-2,2*N-1],[NN-2*N,NN-N+1],[NN-N-2,NN-N-1]]; /* 角のとなり（辺上） */
+const W=(()=>{ const w=[]; for(let i=0;i<NN;i++){ const r=Math.floor(i/N), c=i%N, e=r===0||c===0||r===N-1||c===N-1; w.push(e?8:(r===1||c===1||r===N-2||c===N-2)?-2:1); }
+  CORNERS.forEach(i=>w[i]=100); XSQ.forEach(i=>w[i]=-45); CSQ.flat().forEach(i=>w[i]=-25); return w; })();
+const CNAME=["左上の角","右上の角","左下の角","右下の角"];
+/* マス → ふつうの言葉（座標は見せない） */
+function place(i){
+  const r=Math.floor(i/N), c=i%N, k=CORNERS.indexOf(i); if(k>=0) return CNAME[k];
+  const x=XSQ.indexOf(i); if(x>=0) return `${CNAME[x]}のななめ隣（危険地帯）`;
+  for(let j=0;j<4;j++) if(CSQ[j].includes(i)) return `${CNAME[j]}のとなり（危険地帯）`;
+  const third=v=>v<N/3?0:v>=N-N/3?2:1;
+  if(r===0||r===N-1){ const side=r===0?"上の辺":"下の辺"; return side+["の左寄り","の真ん中","の右寄り"][third(c)]; }
+  if(c===0||c===N-1){ const side=c===0?"左の辺":"右の辺"; return side+["の上寄り","の真ん中","の下寄り"][third(r)]; }
+  const lo=N/2-1, hi=N/2; const v=r<lo?"上":r>hi?"下":"", h=c<lo?"左":c>hi?"右":"";
+  return (h+v)? `${h}${v}寄り` : "真ん中";
+}
+const coord = place;
+function flipsFor(b,i,p){ if(b[i]!==-1) return []; const o=1-p, r0=Math.floor(i/N), c0=i%N, out=[];
+  for(const [dr,dc] of DIRS){ let r=r0+dr,c=c0+dc; const line=[];
+    while(r>=0&&r<N&&c>=0&&c<N&&b[r*N+c]===o){ line.push(r*N+c); r+=dr; c+=dc; }
+    if(line.length && r>=0&&r<N&&c>=0&&c<N&&b[r*N+c]===p) out.push(...line); }
+  return out; }
+function legalRaw(b,p){ const m=[]; for(let i=0;i<NN;i++){ const f=flipsFor(b,i,p); if(f.length) m.push({i,f}); } return m; }
+function legal(p){ return legalRaw(S.b,p).filter(m=>!(S.resv && S.resv.against===p && S.resv.i===m.i)); }
+const count = (b,p) => b.filter(x=>x===p).length;
+
+/* AI: 黒=攻め（返す枚数＋角狙い）、白=位置評価＋機動力 */
+function chooseMove(p, moves){
+  const b=S.b; let best=null, bs=-1e9;
+  for(const m of moves){
+    const nb=b.slice(); nb[m.i]=p; m.f.forEach(x=>nb[x]=p);
+    const oppM=legalRaw(nb,1-p); const giveCorner=oppM.some(x=>CORNERS.includes(x.i));
+    let s;
+    if(p===0) s = m.f.length*4 + (CORNERS.includes(m.i)?80:0) + W[m.i]*1.0 - (giveCorner?45:0) - oppM.length*4 + Math.random()*10;
+    else      s = W[m.i] + (legalRaw(nb,p).length - oppM.length)*3 - (giveCorner?40:0) + m.f.length*0.5 + Math.random()*10;
+    if(s>bs){ bs=s; best=m; }
+  }
+  return best;
+}
+
+/* ===== 状態 ===== */
+const S = { b:[], turn:0, gen:0, over:false, last:-1, leader:-1, endgameSaid:false,
+  titleLv:[0,0], gauge:[0,0], pending:[false,false], skip:[false,false], resv:null,
+  randomNext:[false,false], specials:[0,0], yenTotal:[0,0], moveNo:0, extra:[null,null], cheer:[0,0], buzzCount:[0,0], buzzNext:[false,false], cheerSeen:new Set(), cstate:["normal","normal"], fx:[null,null], real:{botMoves:[0,0], random:[0,0], live:0, sc:0, scYen:0, x:0} };
+const title = p => CONFIG.players[p].ladder[Math.min(S.titleLv[p], CONFIG.players[p].ladder.length-1)];
+const name = p => CONFIG.players[p].short(title(p));      /* 短い表示名 */
+const fullName = p => CONFIG.players[p].full(title(p));   /* フルネーム */
+
+/* ===== 盤面描画 ===== */
+const cells=[];
+(function buildBoard(){
+  const bd=$("board"), cs=480/N;
+  bd.style.gridTemplateColumns=`repeat(${N},${cs}px)`; bd.style.gridTemplateRows=`repeat(${N},${cs}px)`;
+  document.documentElement.style.setProperty("--disc", Math.round(cs*.84)+"px");
+  for(let i=0;i<NN;i++){ const c=document.createElement("div"); c.className="cell"; const d=document.createElement("div"); d.className="disc"; c.appendChild(d); bd.appendChild(c); cells.push(c); }
+})();
+function setDisc(i,v,cls){ const d=cells[i].firstChild; d.innerHTML = v===0?BLACK_SVG : v===1?WHITE_SVG : ""; if(cls){ d.classList.remove("flip","place"); void d.offsetWidth; d.classList.add(cls);} }
+function renderAll(){ for(let i=0;i<NN;i++) setDisc(i,S.b[i]); renderMarks(); updateHUD(); }
+function renderMarks(){
+  cells.forEach((c,i)=>{ c.classList.toggle("last", i===S.last); c.classList.remove("hint"); const r=c.querySelector(".resv"); if(r) r.remove(); });
+  if(!S.over) legal(S.turn).forEach(m=>cells[m.i].classList.add("hint"));
+  if(S.resv){ const r=document.createElement("div"); r.className="resv"; r.textContent="予約済"; cells[S.resv.i].appendChild(r); }
+}
+function updateHUD(){
+  const c0=count(S.b,0), c1=count(S.b,1);
+  $("tc0").textContent=c0; $("tc1").textContent=c1; $("pnum0").textContent=c0; $("pnum1").textContent=c1;
+  $("remain").textContent=`残り ${NN-c0-c1}マス`; SND.bgmIntense(!S.over && NN-c0-c1<=8);
+  drawCard(0); drawCard(1);
+  for(const p of [0,1]){
+    $("tn"+p).textContent=name(p); $("pn"+p).innerHTML=esc(fullName(p)).replace(" ","<br>");
+    $("pc"+p).classList.toggle("turn", !S.over && S.turn===p);
+    $("gt"+p).textContent=`${yen(S.gauge[p])} / ${yen(CONFIG.gaugeMax)}`;
+    $("gf"+p).style.width=Math.min(100,S.gauge[p]/CONFIG.gaugeMax*100)+"%";
+    $("g"+p).classList.toggle("full", S.pending[p]);
+    let sp = S.pending[p] ? "⚡ 必殺技スタンバイ！" : "";
+    if(S.skip[p]) sp="⛳ 接待ゴルフ中（次はお休み）";
+    if(S.randomNext[p]) sp="🍺 二日酔い（次の手ランダム）";
+    if(S.resv && S.resv.against===p) sp=`🚫 ${place(S.resv.i)}は予約済（あと${S.resv.left}手）`;
+    if(S.buzzNext[p]) sp = (sp?sp+" ":"")+"📣 バズり中（次の一手+1枚）";
+    $("sp"+p).textContent=sp;
+    $("ch"+p).innerHTML=[0,1,2,3,4].map(k=>`<span class="pip ${S.cheer[p]>=k+1?"on":S.cheer[p]>=k+.5?"half":""}">📣</span>`).join("");
+  }
+}
+const SPD_SVG=(()=>{ let l=""; for(let k=0;k<24;k++){ const a=k*Math.PI/12, r1=58+(k%3)*6, r2=98; l+=`<line x1="${100+r1*Math.cos(a)}" y1="${100+r1*Math.sin(a)}" x2="${100+r2*Math.cos(a)}" y2="${100+r2*Math.sin(a)}" stroke="#ffd54a" stroke-width="${k%2?3:5}" stroke-linecap="square" opacity=".8"/>`; } return `<svg class="fx spd" viewBox="0 0 200 200">${l}</svg>`; })();
+const IMP_SVG=(()=>{ let pts=[]; for(let k=0;k<32;k++){ const a=k*Math.PI/16, r=k%2?62:96; pts.push(`${(100+r*Math.cos(a)).toFixed(1)},${(100+r*Math.sin(a)).toFixed(1)}`); }
+  return `<svg class="fx imp" viewBox="0 0 200 200"><polygon points="${pts.join(" ")}" fill="#ffeb3b" stroke="#e1251b" stroke-width="6" stroke-linejoin="miter"/><circle cx="100" cy="100" r="44" fill="#fff8c4"/></svg>`; })();
+function chibiHTML(p, state, extra, fx, scale){
+  const sp=SPRITES[p], sc=scale||sp.scale;
+  return (fx==="impact"?IMP_SVG:fx==="turn"?SPD_SVG:"")
+    + `<img class="spr" alt="" src="${sp.src}" width="${sp.w*sc}" height="${sp.h*sc}">`
+    + (state==="think"?`<div class="bub">…</div><div class="sweat"></div>`:"")
+    + (extra==="sash"?`<div class="sash">昇格！！</div>`:extra==="box"?`<div class="box">窓際</div>`:"");
+}
+const cardKey=["",""];
+function drawCard(p, force){
+  const fx = S.fx&&S.fx[p] ? S.fx[p] : (!S.over && S.turn===p ? "turn" : null);
+  const st=(S.cstate&&S.cstate[p])||"normal", key=[st,fx,S.extra[p]].join("|");
+  if(!force && key===cardKey[p]) return; cardKey[p]=key;
+  const el=$("pav"+p); el.className="chibi"+(fx==="turn"?" turn":""); el.innerHTML=chibiHTML(p,st,S.extra[p],fx);
+}
+function pAv(p,state){ return avatarSVG(CONFIG.players[p].costume, state||"normal", CONFIG.players[p].color, S.extra[p]); }
+function setAvatars(){
+  for(const p of [0,1]){ drawCard(p,true); $("tav"+p).innerHTML=avatarSVG(CONFIG.players[p].costume,"normal",null,S.extra[p]); }
+  $("bav").innerHTML=faceSVG("happy"); if(REALPLAY) $("modek").textContent="対局者も本物のGrok Bot"; $("ps0").textContent=CONFIG.players[0].style; $("ps1").textContent=CONFIG.players[1].style;
+}
+
+/* ===== チャット ===== */
+const hhmm=()=>{ const d=new Date(); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); };
+function pushNode(n){ const box=$("msgs"); box.appendChild(n); while(box.children.length>30) box.firstChild.remove(); }
+/* ===== 対局ログ（メモリ＋localStorage、結果画面から保存） ===== */
+let GLOG={ entries:[] };
+const ts=()=>{ const d=new Date(); return [d.getHours(),d.getMinutes(),d.getSeconds()].map(x=>String(x).padStart(2,"0")).join(":"); };
+function logE(kind, text, extra){ const x=extra||{}; const src = x.src || (kind==="move" ? (x.source||"ページ") : "ページ（ゲーム処理）"); GLOG.entries.push(Object.assign({t:ts(), kind, text:String(text)}, x, {src})); if(GLOG.entries.length>3000) GLOG.entries.shift(); }
+function resetLog(){ GLOG={ title:"【生配信】Grok Bot社畜オセロ 〜オラにスパチャを分けてくれ〜 対局ログ", date:new Date().toLocaleString("ja-JP"), board:`${N}×${N}`,
+  mode: REALPLAY?"対局者も本物のGrok Bot":"ページ内AI同士", relay: RELAY.on?"ON":"OFF", realonly: REALONLY?"本物だけモード（定型セリフ・演出スパチャ・保存済みXなし）":"デモ演出あり",
+  players:[{color:"黒",name:fullName(0)},{color:"白",name:fullName(1)}], entries:[] }; }
+const KIND_JA={move:"着手",pass:"パス",chat:"チャット",superchat:"スパチャ",special:"必殺技",buzz:"バズり昇給",flow:"Xコメント",result:"結果",info:"情報"};
+function logText(){
+  const L=[GLOG.title, `日時: ${GLOG.date}`, `盤: ${GLOG.board}　対局モード: ${GLOG.mode}　本物Bot中継: ${GLOG.relay}　表示: ${GLOG.realonly||""}`,
+    `黒: ${GLOG.players?GLOG.players[0].name:""}　白: ${GLOG.players?GLOG.players[1].name:""}`, "".padEnd(40,"─")];
+  for(const e of GLOG.entries) L.push(`[${e.t}] ${(KIND_JA[e.kind]||e.kind).padEnd(5,"　")} 〔${e.src}〕 ${e.text}`);
+  return L.join("\n")+"\n"; }
+function saveLocal(){ try{ localStorage.setItem("gbt_othello_lastlog", JSON.stringify(GLOG)); }catch(e){} }
+function download(name, text, type){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000); }
+function logFileBase(){ const d=new Date(); return `othello-log-${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}-${String(d.getHours()).padStart(2,"0")}${String(d.getMinutes()).padStart(2,"0")}`; }
+
+function chat(who, text, color, costume, live){
+  if(live){ RS.live++; S.real.live++; realCounts(); }
+  logE("chat", `${who}: ${text}`, {who, live:!!live, src: live?"本物Bot":(who==="視聴者"?"視聴者入力":"定型セリフ（演出）")});
+  const m=document.createElement("div"); m.className="m"+(live?" real":"");
+  if(who==="視聴者") m.className+=" human";
+  m.innerHTML=`<span class="av">${costume?avatarSVG(costume):faceSVG()}</span><span class="body">${live?'<span class="lv">LIVE</span>':""}${who==="視聴者"?'<span class="htag">人間</span>':""}<span class="nm" style="color:${color||"#ccc"}">${esc(who)}</span>${esc(text)}</span><span class="tm">${hhmm()}</span>`;
+  pushNode(m);
+}
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function sysChat(text, delay){ setTimeout(()=>{
+  logE("info", text, {src:"実況ログ（ページ）"});
+  const m=document.createElement("div"); m.className="m sys"; m.innerHTML=`<span class="body"><span class="stag">実況ログ</span>${esc(text)}</span><span class="tm">${hhmm()}</span>`; pushNode(m); }, (delay||0)*SPEED); }
+/* 事実の通知：本物だけモードでは実況ログ、それ以外は従来どおり観客Botの口調 */
+function factChat(text, delay, who){ if(REALONLY) sysChat(text, delay); else specChat(text, delay, who); }
+function specChat(text, delay, who){ if(REALONLY) return; const s=who||rnd(CONFIG.spectators); setTimeout(()=>chat(s.short||s.name,text,s.color,s.costume), (delay??(300+Math.random()*1200))*SPEED); }
+/* イベントkeyに合わせて、キャラの口調で喋らせる */
+function say(key, v, delay){
+  if(REALONLY) return;
+  if(RELAY.realActive() && Math.random()<.5) return;
+  const s=rnd(CONFIG.spectators), own=s.voice&&s.voice[key];
+  let line=null;
+  for(let k=0;k<4;k++){ line = (own && (Math.random()<.75 || !T[key])) ? rnd(own) : (T[key] ? rnd(T[key]) : null); if(line!==say.last) break; }
+  if(line===say.last && T[key]) line=rnd(T[key]);
+  if(!line) return; say.last=line;
+  specChat(fill(line, Object.assign({time:hhmm()}, v)), delay, s);
+}
+function playerChat(p,text,delay){ if(REALONLY) return; setTimeout(()=>chat(name(p),text,CONFIG.players[p].color,CONFIG.players[p].costume), (delay??500)*SPEED); }
+function fill(t,v){ return t.replace(/\{(\w+)\}/g,(_,k)=>v[k]??""); }
+
+/* ===== スーパーチャット ＆ ゲージ ===== */
+function superChat(fromLabel, text, amount, target){
+  const n=document.createElement("div"); n.className="sc";
+  const tgt = target==null ? "" : `→ ${name(target)} に応援`;
+  n.innerHTML=`<div class="sch"><span>★ ${esc(fromLabel)}</span><span>${yen(amount)}</span></div><div class="scb">${esc(text)}<div class="sct">${esc(tgt)}</div></div>`;
+  const lv=String(fromLabel).startsWith("LIVE");
+  pushNode(n); logE("superchat", `${fromLabel} ${yen(amount)}「${text}」${target==null?"":" → "+name(target)}`, {amount, live:lv, src: lv?"本物Bot":"デモ/定型（演出）"});
+  SND.coin();
+  if(target!=null && !S.over) relayEv("superchat",`${name(target)}に${yen(amount)}のスパチャ「${String(text).slice(0,30)}」`,{target:name(target),amount,text:String(text).slice(0,30)});
+  if(target!=null && !S.over) addGauge(target, amount);
+}
+function addGauge(p, amount, noYen){
+  if(!noYen) S.yenTotal[p]+=amount;
+  if(S.pending[p]){ updateHUD(); return; }
+  S.gauge[p]=Math.min(CONFIG.gaugeMax, S.gauge[p]+amount);
+  if(S.gauge[p]>=CONFIG.gaugeMax){ S.pending[p]=true; SND.full(); factChat(`${name(p)}のスパチャゲージMAX！次の手番で必殺技`,400); }
+  updateHUD();
+}
+function guessTarget(text){ if(/高井|エビデンス|リサーチ|白/.test(text)) return 1; if(/Windows|ウィンドウズ|2000|窓際|ガンバ|ハゲタ|課長|CEO|社長|黒/.test(text)) return 0; return Math.random()<.5?0:1; }
+const BOT_SC = [["{t}に全賭け！"],["角取ったらボーナス出します"],["{t}、昇格したら奢ってください"],["経費で応援します"],
+  ["{t}の一手に感動した"],["ボーナス全部{t}に！"],["{t}、部長の椅子はすぐそこ！"],["定時前に決めてくれ{t}！"]];
+function botSuperChat(){
+  const s=rnd(CONFIG.spectators), t=Math.random()<.5?0:1, amt=rnd([1000,2000,2000,3000,5000]);
+  superChat(s.short||s.name, fill(rnd(BOT_SC)[0],{t:name(t)}), amt, t);
+}
+
+/* ===== 必殺技 ===== */
+const SPECIALS = SPECIAL_MOVES;
+async function doSpecial(p, gen){
+  const o=1-p;
+  let pool=SPECIALS.slice();
+  const emptyCorners=CORNERS.filter(i=>S.b[i]===-1);
+  if(!emptyCorners.length) pool=pool.filter(s=>s.id!=="kado");
+  const victims=[]; for(let i=0;i<NN;i++) if(S.b[i]===o && !CORNERS.includes(i)) victims.push(i);
+  const oc=count(S.b,o);
+  if(oc<(N===6?6:7) || victims.length<4) pool=pool.filter(s=>s.id!=="keihi"&&s.id!=="tobashi");
+  const sp=rnd(pool);
+  S.pending[p]=false; S.gauge[p]=0; S.specials[p]++; updateHUD();
+  logE("special", `${name(p)}の必殺技「${sp.name}」— ${sp.desc}`);
+  if(REALONLY) sysChat(`${name(p)}の必殺技「${sp.name}」発動（スパチャゲージ満タン）`);
+  S.fx[p]="impact"; drawCard(p); setTimeout(()=>{ S.fx[p]=null; drawCard(p); }, 4500*Math.max(SPEED,.3));
+  relayEv("special",`${name(p)}の必殺技「${sp.name}」！ ${sp.desc}`,{caster:name(p),target:name(o),special:sp.name});
+  $("cutav").className="cav chibi"; $("cutav").innerHTML=chibiHTML(p,"normal",S.extra[p],"impact",2);
+  $("cutwho").textContent=`${fullName(p)} の必殺技！`; $("cutname").textContent=`「${sp.name}」`; $("cutname").style.fontSize=(sp.name.length>10?44:sp.name.length>7?54:64)+"px"; $("cutdesc").textContent=sp.desc;
+  const cut=$("cut"); cut.style.display="flex"; SND.bgmDuck(2600); SND.special(); cut.querySelectorAll("*").forEach(e=>{e.style.animation="none"; void e.offsetWidth; e.style.animation="";});
+  await sleep(2200); cut.style.display="none"; if(gen!==S.gen) return;
+  if(sp.id==="keihi"){
+    const n=Math.min(oc-4, 2+Math.floor(Math.random()*2)); const pick=victims.sort(()=>Math.random()-.5).slice(0,n);
+    pick.forEach((i,k)=>{ S.b[i]=p; setTimeout(()=>setDisc(i,p,"flip"),k*150*SPEED); });
+    factChat(`必殺技の効果：${name(o)}の石${n}枚が${p===0?"黒":"白"}に変わった`,600);
+    specChat(rnd(["経理部が泣いてる","それ領収書あるの？w","監査入ります","ズルいけど面白いw"]),1500);
+  } else if(sp.id==="kaigi"){
+    S.skip[o]=true; factChat(`必殺技の効果：${name(o)}は次の手番お休み`,600);
+    specChat(rnd(["ナイスショット〜（棒）","平日にゴルフw","OBしてきてほしい"]),1500);
+  } else if(sp.id==="tobashi"){
+    const n=Math.min(oc-5, 1+Math.floor(Math.random()*2)); const pick=victims.sort(()=>Math.random()-.5).slice(0,n);
+    pick.forEach(i=>{ S.b[i]=-1; const d=cells[i].firstChild; d.animate([{transform:"translateY(0) rotate(0)",opacity:1},{transform:"translateY(-140px) rotate(540deg) scale(.3)",opacity:0}],{duration:900*Math.max(SPEED,.3)}); });
+    setTimeout(()=>pick.forEach(i=>setDisc(i,-1)),900*Math.max(SPEED,.3));
+    factChat(`必殺技の効果：${name(o)}の石${n}枚が盤から消えた`,600);
+    specChat(rnd(["人事こわすぎ","辞令が突然すぎるw","盤面から消えるのは草"]),1500);
+  } else if(sp.id==="nomi"){
+    S.randomNext[o]=true; factChat(`必殺技の効果：${name(o)}の次の一手はページがランダムに選ぶ`,600);
+    specChat(rnd(["ウーロン茶でお願いします","アルハラでは？w","明日の一手が心配"]),1500);
+  } else {
+    const c=rnd(emptyCorners); S.resv={i:c, against:o, left:3};
+    factChat(`必殺技の効果：${place(c)}は3手のあいだ${name(o)}が打てない（予約済）`,600);
+    specChat(rnd(["角を予約って何w","ホテルかよw","3手は長いぞこれ"]),1500);
+  }
+  say("special",{p:name(p),o:name(o)},2300);
+  await sleep(900); renderAll();
+}
+
+/* ===== 実況テンプレ ===== */
+const T = {
+  open:["始まった！先手は{p}","今日はどっちが勝つ？","黒い石が全部Grok Botの顔なのかわいい","窓際族対意識高い系、社内の頂上決戦"],
+  corner:["{p}が{c}をゲット！これはデカい","角きたーー！{c}は痛い","{o}、{c}を取られたのキツいね","角は正義。{p}わかってる","{c}確保、ここから辺が伸びるぞ"],
+  big:["{c}で{n}枚返し！？えぐい","一気に{n}枚ひっくり返った","{p}、{c}に打って{n}枚返し！{b}対{wc}","今の{n}枚はでかい"],
+  pass:["{p}打てる場所なくてパス！","パスきた、{o}の連続手番","完全に封じ込められてる…"],
+  lead:["逆転！{lead}が{diff}枚リード","ここで{lead}が前に出た！","形勢ひっくり返ったぞ {b}-{wc}"],
+  xsq:["{c}に打った…角あげちゃわない？","その一手、悪手っぽい気が"],
+  edge:["{p}、{c}を取りにいった","辺の攻防が熱い","{p}、辺を固めてきた"],
+  endg:["残り{r}手、ここからが勝負","終盤戦突入！今{b}-{wc}"],
+  fill:["{lead}が{diff}枚リード中","今{b}対{wc}。まだわからん","{p}が{c}へ。渋い一手","Windows2000はマイペース、高井はデータ。性格出てる","この配信おもしろすぎる","{o}の次の一手に注目","考える時間長くない？w","仕事より楽しそう","これ議事録に書いとくね","スパチャ投げたい","そこは読んでた","この配信見てる人いる？"],
+  end:["決着！{w}の勝ち！ {b}-{wc}","いい試合だった"],
+  promo:["{nw}、昇格おめでとう！！","辞令出ました！","名刺作り直さなきゃ"],
+  buzz:["{p}、Xでバズってる！","バズり昇給きた！{p}の次の一手に注目","トレンド入りか！？{p}"]
+};
+function narrate(p,m){
+  const c0=count(S.b,0), c1=count(S.b,1), r=NN-c0-c1, lead=c0===c1?-1:(c0>c1?0:1);
+  const v={p:name(p),o:name(1-p),c:coord(m.i),n:m.f.length,b:c0,wc:c1,r,lead:lead<0?"両者":name(lead),diff:Math.abs(c0-c1)};
+  const keys=[];
+  if(m.f.length>S.maxFlip[p].n) S.maxFlip[p]={n:m.f.length,at:place(m.i)};
+  if(S.moveNo===1) keys.push("open");
+  if(CORNERS.includes(m.i)){ keys.push("corner"); SND.corner(); }
+  else if(m.f.length>=5) keys.push("big");
+  if(XSQ.includes(m.i) && S.b[CORNERS[XSQ.indexOf(m.i)]]===-1) keys.push("xsq");
+  if(lead>=0 && S.leader>=0 && lead!==S.leader && r<NN-8) keys.push("lead");
+  if(lead>=0) S.leader=lead;
+  if(r<=(N===6?6:10) && !S.endgameSaid){ S.endgameSaid=true; keys.push("endg"); }
+  if(!keys.length){ const e=m.i%N===0||m.i%N===N-1||m.i<N||m.i>=NN-N; if(e && Math.random()<.4) keys.push("edge"); else if(Math.random()<.6) keys.push("fill"); }
+  keys.slice(0,2).forEach((k,i)=>say(k, v, 300+i*900+Math.random()*500));
+  const who=`${p?"白":"黒"}の${v.p}`;
+  if(keys.includes("corner")) relayEv("corner",`${who}が${v.c}の角を取った（${c0}-${c1}）`,{player:v.p,where:v.c});
+  else if(keys.includes("big")) relayEv("big_flip",`${who}が${v.c}で${v.n}枚返し（${c0}-${c1}）`,{player:v.p,where:v.c,flips:v.n});
+  else if(keys.includes("lead")) relayEv("lead_change",`逆転！${v.lead}が${v.diff}枚リード（${c0}-${c1}）`,{player:v.lead,where:v.c});
+  else if(S.moveNo%10===0) relayEv("progress",`${S.moveNo}手目、${who}が${v.c}。${c0}-${c1}、残り${r}マス`,{player:v.p,where:v.c});
+  if(Math.random()<.14) playerChat(p, fill(rnd(CONFIG.players[p].me),v), 200);
+}
+
+/* ===== ゲームループ ===== */
+async function newGame(){
+  const gen=++S.gen; if(GLOG.entries.length) saveLocal(); resetLog(); if(started) SND.bgmStart();
+  Object.assign(S,{ b:Array(NN).fill(-1), maxFlip:[{n:0,at:""},{n:0,at:""}], timeouts:[0,0], turn:0, over:false, last:-1, leader:-1, endgameSaid:false, gauge:[0,0], pending:[false,false], skip:[false,false], resv:null, randomNext:[false,false], specials:[0,0], yenTotal:[0,0], moveNo:0, extra:[null,null], cheer:[0,0], buzzCount:[0,0], buzzNext:[false,false], cheerSeen:new Set(), cstate:["normal","normal"], fx:[null,null], real:{botMoves:[0,0], random:[0,0], live:0, sc:0, scYen:0, x:0} });
+  setAvatars();
+  { const a=(N/2-1)*N+(N/2-1); S.b[a]=1; S.b[a+N+1]=1; S.b[a+1]=0; S.b[a+N]=0; }
+  $("endov").style.display="none"; renderAll();
+  relayEv("game_start",`対局開始！ 黒 ${name(0)} vs 白 ${name(1)}`,{},true);
+  let passes=0;
+  while(gen===S.gen){
+    const p=S.turn, o=1-p;
+    if(S.pending[p] && S.moveNo>=(N===6?4:8)){ await doSpecial(p,gen); if(gen!==S.gen) return; }
+    if(legalRaw(S.b,0).length===0 && legalRaw(S.b,1).length===0) break;
+    if(S.skip[p]){
+      S.skip[p]=false; S.lastDesc=`${name(p)}は接待ゴルフで1回休み`; logE("pass", `${name(p)}は接待ゴルフで1回休み`); factChat(`${name(p)}は接待ゴルフで1回休み`,200); SND.pass(); tickResv(p);
+      S.turn=o; renderAll(); await sleep(1200); continue;
+    }
+    const moves=legal(p);
+    if(!moves.length){
+      say("pass",{p:name(p),o:name(o)},200); if(REALONLY) sysChat(`${name(p)}は打てる場所がなくパス`); SND.pass(); relayEv("pass",`${name(p)}は打てる場所がなくパス`,{player:name(p)}); S.lastDesc=`${name(p)}は打てる場所がなくパスした`; logE("pass", `${name(p)}は打てる場所がなくパス`); tickResv(p);
+      S.turn=o; renderAll(); await sleep(1300); if(++passes>6) break; continue;
+    }
+    passes=0;
+    S.cstate[p]="think"; drawCard(p);
+    let m;
+    let src="ページ内AI";
+    if(S.randomNext[p]){ src="飲みニケーション効果：ランダム（ページが選択）"; S.real.random[p]++; await sleep(1500); if(gen!==S.gen) return; S.randomNext[p]=false; m=rnd(moves); factChat(`飲みニケーション効果：${name(p)}の手はページがランダムに選んだ（${place(m.i)}）`,300); }
+    else if(REALPLAY){ const t0=S.timeouts[p]; m=await askBot(p,moves,gen); if(gen!==S.gen) return; src = S.timeouts[p]>t0 ? "時間切れ→代打ち（ページのAI）" : "本物Bot"; }
+    else { await sleep(1500+Math.random()*1000); if(gen!==S.gen) return; m=chooseMove(p,moves); }
+    S.cstate[p]="normal"; drawCard(p);
+    S.b[m.i]=p; m.f.forEach(x=>S.b[x]=p); S.last=m.i; S.moveNo++;
+    buzzExtraFlip(p,m);
+    S.lastDesc=`${name(p)}が${place(m.i)}に打って${m.f.length}枚返した`;
+    logE("move", `${S.moveNo}手目 ${p?"白":"黒"} ${name(p)} → ${place(m.i)}（${m.f.length}枚返し）［${src}］ ${count(S.b,0)}-${count(S.b,1)}`, {move:S.moveNo, color:p?"white":"black", where:place(m.i), flips:m.f.length, source:src});
+    if(REALONLY) sysChat(`${S.moveNo}手目：${name(p)}が${place(m.i)}に打った（${m.f.length}枚返し）${src==='本物Bot'?'':'［'+src+'］'}`);
+    setDisc(m.i,p,"place"); SND.place();
+    const r0=Math.floor(m.i/N), c0=m.i%N;
+    m.f.forEach(x=>{ const d=Math.max(Math.abs(Math.floor(x/N)-r0),Math.abs(x%N-c0)); setTimeout(()=>{ if(gen===S.gen){ setDisc(x,p,"flip"); SND.tick(); } }, d*70*SPEED); });
+    tickResv(p);
+    S.turn=o; renderMarks(); updateHUD(); narrate(p,m);
+    if(!REALONLY && Math.random()<.12) setTimeout(botSuperChat, 900*SPEED);
+    await sleep(500);
+  }
+  if(gen===S.gen) await endGame(gen);
+}
+function tickResv(p){ if(S.resv && S.resv.against===p && --S.resv.left<=0){ factChat(`${place(S.resv.i)}の予約が期限切れで解除`,500); S.resv=null; } }
+
+function logStats(){ [0,1].forEach(p=>logE("result", `${name(p)}: 必殺技${S.specials[p]}回・バズり昇給${S.buzzCount[p]}回・スパチャ${yen(S.yenTotal[p])}・最大返し${S.maxFlip[p].n}枚${S.maxFlip[p].at?`（${S.maxFlip[p].at}）`:""}・本物Botの手${S.real.botMoves[p]}・代打ち（ページのAI）${S.timeouts[p]}回・ランダム${S.real.random[p]}回`, {src:"ページ（集計）"}));
+  if(REALONLY) logE("result", `本物だけ集計：LIVEコメント${S.real.live}件・本物スパチャ${S.real.sc}件${yen(S.real.scYen)}・ライブX投稿${S.real.x}件`, {src:"ページ（集計）"}); }
+function statsHTML(){ return [0,1].map(p=>`<div>${esc(name(p))}<br>必殺技 <b>${S.specials[p]}回</b> ／ バズり昇給 <b>${S.buzzCount[p]}回</b><br>スパチャ <b>${yen(S.yenTotal[p])}</b> ／ 最大返し <b>${S.maxFlip[p].n}枚</b>${S.maxFlip[p].at?`（${esc(S.maxFlip[p].at)}）`:""}${REALPLAY?`<br>本物Botの手 <b>${S.real.botMoves[p]}</b> ／ 代打ち（ページのAI） <b>${S.timeouts[p]}</b>${S.real.random[p]?` ／ ランダム <b>${S.real.random[p]}</b>`:""}`:""}</div>`).join("")
+  + (REALONLY?`<div style="flex-basis:100%;margin-top:3px;color:#9f9">本物だけ集計：LIVEコメント <b>${S.real.live}件</b> ／ 本物スパチャ <b>${S.real.sc}件 ${yen(S.real.scYen)}</b> ／ ライブX投稿 <b>${S.real.x}件</b></div>`:""); }
+function endAvs(win){ $("endavs").innerHTML=[0,1].map(q=>`<div class="chibi" style="width:110px;height:96px">${chibiHTML(q,"normal",S.extra[q],null,q===0?1.4:1.2)}</div>`).join(""); }
+async function endGame(gen){
+  S.over=true; SND.bgmStop(); renderMarks(); updateHUD(); SND.gong(); buzzQ.length=0; $("buzz").classList.remove("show"); waitUI(null);
+  const c0=count(S.b,0), c1=count(S.b,1), win=c0===c1?-1:(c0>c1?0:1);
+  $("endwin").innerHTML = win<0 ? "引き分け！" : `勝者 <span style="color:${CONFIG.players[win].color}">${esc(fullName(win))}</span>`;
+  $("endscore").textContent=`黒 ${c0} － ${c1} 白`;
+  $("promo").innerHTML=""; endAvs(-1); $("stats").innerHTML=statsHTML();
+  $("endov").style.display="flex";
+  if(REALONLY) sysChat(win<0?`引き分け（黒${c0}-${c1}白）`:`決着：${name(win)}の勝ち（黒${c0}-${c1}白）`);
+  if(win<0) specChat("まさかの引き分け！",200); else { say("end",{w:name(win),b:c0,wc:c1},200); say("end",{w:name(win),b:c0,wc:c1},1100); }
+  await sleep(1800); if(gen!==S.gen) return;
+  if(win>=0){
+    const lose=1-win, P=CONFIG.players[win], oldT=title(win);
+    if(S.titleLv[win] < P.ladder.length-1) S.titleLv[win]++;
+    const newT=title(win), nw=name(win);
+    $("promo").innerHTML = (oldT===newT ? `<div class="promo-tag">殿堂入り</div><div class="promo-new">${esc(newT)}</div>` :
+      `<div class="promo-tag">🎉 昇格 🎉</div><div class="promo-person">${esc(P.person)}</div><div><span class="promo-old">${esc(oldT)}</span><span class="promo-arrow">▶</span><span class="promo-new">${esc(newT)}</span></div>`)
+      + `<div class="promo-loser">${esc(name(lose))} は窓際へ…📦</div>`;
+    S.extra[win]="sash"; S.extra[lose]="box"; S.cstate[win]="happy"; setAvatars();
+    confetti(); updateHUD(); endAvs(win); SND.fanfare();
+    setTimeout(()=>{ if(gen===S.gen) SND.sad(); }, 2600*Math.max(SPEED,.5));
+    say("promo",{nw},400); say("promo",{nw},1300);
+    playerChat(win, fill(rnd(P.win),{t:newT}),2200);
+    playerChat(lose, rnd(CONFIG.players[lose].lose),3200);
+    $("stats").innerHTML=statsHTML();
+    logE("result", `決着！${name(win)}の勝ち（黒${c0}-${c1}白）。${oldT}→${newT}に昇格、${name(lose)}は窓際へ`); logStats(); saveLocal(); setTimeout(saveLocal,6000);
+    relayEv("end",`決着！${name(win)}の勝ち（黒${c0}-${c1}白）。${oldT}→${newT}に昇格、${name(lose)}は窓際へ`,{winner:name(win),loser:name(lose),promotion:`${oldT}→${newT}`},true);
+  } else { $("promo").innerHTML=`<div class="promo-tag">両者据え置き</div>`; logE("result", `引き分け（${c0}-${c1}）。両者据え置き`); logStats(); saveLocal(); relayEv("end",`引き分け（${c0}-${c1}）。両者据え置き`,{winner:null},true); }
+  if(REALPLAY){ const c0e=count(S.b,0), c1e=count(S.b,1), we=c0e===c1e?null:(c0e>c1e?"black":"white");
+    ["black","white"].forEach(c=>RELAY.publish(`mv-${c}`,{type:"game_end", winner:we, score:{black:c0e,white:c1e}}));
+    $("rematch").textContent="再戦する"; return; }   /* 本物Bot対戦は自動で再戦しない（Botを再起動してからボタンで） */
+  let sec=CONFIG.restartSec; $("cd").textContent=sec;
+  while(sec>0){ await new Promise(r=>setTimeout(r,FAST?400:1000)); if(gen!==S.gen) return; sec--; $("cd").textContent=sec; }
+  newGame();
+}
+function confetti(){
+  const g=$("game"), cols=["#ffd54a","#e1251b","#7fc8ff","#9dff9d","#ff7fb0","#fff"];
+  for(let k=0;k<90;k++){ const c=document.createElement("div"); c.className="conf"; c.style.left=Math.random()*880+"px"; c.style.background=rnd(cols);
+    c.style.animationDuration=(2+Math.random()*2.5)+"s"; c.style.animationDelay=Math.random()*.8+"s"; g.appendChild(c); setTimeout(()=>c.remove(),5000); }
+}
+$("logtxt").onclick=()=>download(logFileBase()+".txt", logText(), "text/plain;charset=utf-8");
+$("logjson").onclick=()=>download(logFileBase()+".json", JSON.stringify(GLOG,null,1), "application/json");
+$("rematch").onclick=()=>{ $("rematch").innerHTML=`再戦する（<span id="cd">${CONFIG.restartSec}</span>）`; newGame(); };
+
+/* ===== X応援ゲージ ＆ バズり昇給 ===== */
+const RE_BLACK=/Windows|ウィンドウズ|2000|窓際|ガンバ|ハゲタ|課長|黒|CEO/i, RE_WHITE=/高井|エビデンス|白|リサーチ|意識高/;
+function cheerFor(text){ const b=RE_BLACK.test(text), w=RE_WHITE.test(text); if(b||w) return [b?1:0, w?1:0]; return [.5,.5]; }
+function processPost(c){ /* 1ゲーム中に同じポストIDは1回だけ数える */
+  let hl=false;
+  if(!S.over && c.id && !S.cheerSeen.has(c.id)){
+    S.cheerSeen.add(c.id); const [a,b]=cheerFor(c.text);
+    if(a&&b&&a<1&&Math.random()<.3) specChat(rnd(["社内報に載ったぞ！両方に応援+0.5","Xで話題になってる、全社的に追い風","社内報デビューおめでとう"]),300);
+    hl = addCheer(0,a) | addCheer(1,b);
+    updateHUD();
+  }
+  return hl;
+}
+function addCheer(p,amt){ if(!amt) return false; S.cheer[p]=Math.min(5,S.cheer[p]+amt); if(S.cheer[p]>=5){ triggerBuzz(p); return true; } return false; }
+const buzzQ=[]; let buzzBusy=false;
+function triggerBuzz(p){
+  logE("buzz", `${name(p)}がXでバズって昇給（次の一手で1枚多く返す＋ゲージ¥5,000）`);
+  S.cheer[p]=0; S.buzzCount[p]++; S.buzzNext[p]=true;
+  addGauge(p,5000,true); updateHUD(); SND.buzz();
+  buzzQ.push(p); if(!buzzBusy) nextBanner();
+  say("buzz",{p:name(p)},500); if(REALONLY) sysChat(`${name(p)}：X応援が5たまって「バズり昇給」`);
+  relayEv("buzz",`${name(p)}がXでバズって昇給！次の一手で1枚多く返す＋ゲージ¥5,000`,{player:name(p)},false);
+}
+function nextBanner(){
+  const p=buzzQ.shift(); if(p==null){ buzzBusy=false; return; } buzzBusy=true;
+  $("buzzt").textContent=`📣 バズり昇給！ ${name(p)}`; $("buzzs").textContent="次の一手で1枚多く返す ＋ スパチャゲージ ¥5,000";
+  $("buzz").classList.add("show");
+  setTimeout(()=>{ $("buzz").classList.remove("show"); setTimeout(nextBanner,450); }, 2600*Math.max(SPEED,.6));
+}
+function buzzExtraFlip(p,m){ /* 置いた石の隣の相手石（角以外）を1枚追加で返す */
+  if(!S.buzzNext[p]) return; S.buzzNext[p]=false;
+  const r0=Math.floor(m.i/N), c0=m.i%N, cand=[];
+  for(const [dr,dc] of DIRS){ const r=r0+dr,c=c0+dc; if(r<0||r>N-1||c<0||c>N-1) continue; const i=r*N+c; if(S.b[i]===1-p && !CORNERS.includes(i)) cand.push(i); }
+  if(!cand.length){ factChat(`${name(p)}のバズり効果は不発（隣に相手の石なし）`,600); return; }
+  const x=rnd(cand); S.b[x]=p; m.f.push(x);
+  factChat(`バズり効果：${place(x)}の石も${p?"白":"黒"}に変わった`,700);
+}
+
+/* ===== ニコニコ風コメント ===== */
+const nico={ seen:new Set(), queue:[], pool:[], lanes:Array(11).fill(0) };
+function flow(text, gold, hl, src){
+  logE("flow", text+(hl?"（バズり発動）":""), {src: src||"X（保存済み一覧）"});
+  const now=performance.now(); let lane=nico.lanes.indexOf(Math.min(...nico.lanes));
+  const free=nico.lanes.map((t,i)=>t<now?i:-1).filter(i=>i>=0); if(free.length) lane=rnd(free);
+  const el=document.createElement("div"); el.className="nc"+(gold?" gold":"")+(hl?" buzzhl":""); el.textContent=text; el.style.top=(12+lane*48)+"px";
+  $("nico").appendChild(el);
+  const w=el.offsetWidth, dur=(7000+Math.random()*4000)*(FAST?.5:1);
+  nico.lanes[lane]=now+dur*(w+80)/(880+w);
+  el.animate([{transform:"translateX(0)"},{transform:`translateX(${-(880+w+20)}px)`}],{duration:dur,easing:"linear"}).onfinish=()=>el.remove();
+}
+function ingest(list){
+  if(!Array.isArray(list)) return;
+  for(const c of list){ if(!c || !c.text || nico.seen.has(c.id)) continue; nico.seen.add(c.id); nico.queue.push(c); nico.pool.push(c); }
+}
+async function poll(){
+  if(REALONLY) return;   /* 本物だけモード：保存済み一覧は使わない */
+  if(location.protocol==="file:"){ ingest(SEED_COMMENTS); return; }
+  try{ const r=await fetch(CONFIG.commentsUrl+"?t="+Date.now(),{cache:"no-store"}); if(!r.ok) throw 0; ingest(await r.json()); }
+  catch(e){ ingest(SEED_COMMENTS); }
+}
+let scCount=0;
+function nicoTick(){
+  let c=nico.queue.shift();
+  if(!REALONLY && !c && nico.pool.length && Math.random()<.6) c={...rnd(nico.pool), replay:true};
+  if(c){ const hl=processPost(c); if(c.live){ S.real.x++; } flow(c.text,false,hl, c.live?"X（ライブ中継）":"X（保存済み一覧）"); }
+  if(REALONLY) $("xhint").style.display = RS.x ? "none" : "block";   /* Xのポストは流れるだけ（スパチャにはしない） */
+  setTimeout(nicoTick, (nico.queue.length?1800:3500+Math.random()*3000)*(FAST?.4:1));
+}
+
+/* ===== 視聴者入力・デモキー ===== */
+function sendUser(){ const v=$("inp").value.trim(); if(!v) return; $("inp").value=""; flow(v,false,false,"視聴者入力"); chat("視聴者",v,"#aaa"); }
+$("send").onclick=sendUser; $("inp").addEventListener("keydown",e=>{ if(e.key==="Enter") sendUser(); e.stopPropagation(); });
+function toggleMute(){ const m=SND.toggle(); $("mute").textContent=m?"🔇":"🔊"; }
+$("mute").onclick=toggleMute;
+addEventListener("keydown",e=>{
+  if(e.key==="m"||e.key==="M") toggleMute();
+  if(e.key==="b"||e.key==="B"){ const on=SND.bgmToggle(); factChat(on?"BGM ON":"BGM OFF",0,CONFIG.spectators[1]); }
+  if(REALONLY) return;   /* 本物だけモード：デモキー1〜4は無効 */
+  if(e.key==="3"||e.key==="4"){ const p=+e.key-3; const c={id:"demo"+Date.now()+Math.random(), text:p?"高井のエビデンス最強！":"Windows2000課長がんばれ！"}; const hl=processPost(c); flow(c.text,false,hl); }
+  if(e.key==="1"||e.key==="2"){ const p=+e.key-1; superChat("テスト視聴者", rnd([`${name(p)}がんばれ！`,`${name(p)}に全額！`,"必殺技見たい！"]), rnd([2000,3000,4000,5000]), p); }
+});
+if(!REALONLY) setInterval(()=>{ $("viewers").textContent=`👁 ${(120+Math.floor(Math.random()*40)).toLocaleString()}人が視聴中`; },5000);
+
+/* ===== 起動 ===== */
+setAvatars();
+if(REALONLY){ realCounts(); sysChat("本物だけモード：チャットは本物のBotの発言・視聴者の入力・実況ログだけ。Xは今この配信中の投稿だけ流れます"); }
+else specChat("配信スタート！ コメントが画面に流れるよ",0,CONFIG.spectators[1]);
+let started=false;
+function startStream(){ if(started) return; started=true; SND.init(); SND.bgmStart(); RELAY.init(realChat, c=>{ RS.x++; realCounts(); ingest([{...c, live:true}]); }, onBotMove); if(REALONLY) $("xhint").style.display="block"; $("startov").style.display="none";
+  poll().then(()=>{ nicoTick(); }); setInterval(poll, CONFIG.pollMs); newGame(); }
+$("startbtn").onclick=startStream;
+if(FAST || Q.has("autostart")) startStream();
+</script>
+</body>
+</html>
