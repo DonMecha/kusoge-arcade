@@ -11,3 +11,7 @@
 
 GitHub Pagesで公開しています。各作品の説明と注意書きは作品内をご覧ください。
 PafuPafu RPGの記録は端末とブラウザごとに保存されます。別URLから移る場合は旧URLでJSONを書き出し、新URLで読み込んでください。
+
+## License
+
+MIT。全文は [LICENSE](LICENSE) です。
