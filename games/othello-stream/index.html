@@ -293,7 +293,7 @@ const SPECIAL_MOVES = [
   { id:"tobashi", name:"飛ばし人事",               desc:"相手の石1〜2枚を盤外へ異動！" },
   { id:"nomi",    name:"飲みニケーション強制参加", desc:"二日酔いで相手の次の一手はランダム" }
 ];
-/* comments.json が読めない時（file://）用の初期データ。comments.json と同じサンプル */
+/* comments.json が読めないときの初期データ。comments.json と同じサンプル */
 const SEED_COMMENTS = /*SEED_START*/[{"id": "sample-01", "text": "配信きた！オセロ実況たのしみ"}, {"id": "sample-02", "text": "Windows2000課長がんばれ"}, {"id": "sample-03", "text": "高井のエビデンス最強"}, {"id": "sample-04", "text": "黒優勢？まだわからん"}, {"id": "sample-05", "text": "白の角取りうまい"}, {"id": "sample-06", "text": "スパチャ投げたい"}, {"id": "sample-07", "text": "定時までに終わってほしい"}, {"id": "sample-08", "text": "必殺技見たい！"}, {"id": "sample-09", "text": "データ通りの一手だ"}, {"id": "sample-10", "text": "窓際族なのに強い"}, {"id": "sample-11", "text": "この配信おもしろすぎる"}, {"id": "sample-12", "text": "お茶がうまそう"}, {"id": "sample-13", "text": "残業マンが燃えてる"}, {"id": "sample-14", "text": "ゴマ擦造のコメント好き"}, {"id": "sample-15", "text": "再戦希望！"}, {"id": "sample-16", "text": "社畜オセロ、仕事より楽しい"}, {"id": "sample-17", "text": "黒に全額！"}, {"id": "sample-18", "text": "白のポジション読みが鋭い"}, {"id": "sample-19", "text": "角取ったの熱い"}, {"id": "sample-20", "text": "コメント流れてるの好き"}]/*SEED_END*/;
 
 const Q = new URLSearchParams(location.search);
@@ -372,62 +372,8 @@ const SND = (()=>{
   };
 })();
 
-/* ===== 本物Bot実況リレー（?relay=<topic> のときだけON。トピックは埋め込まない） ===== */
-const RELAY = (()=>{
-  const raw=Q.get("relay")||""; const topic=/^[A-Za-z0-9_-]{6,64}$/.test(raw)?raw:null;
-  const rh=Q.get("relayhost")||""; const HOST=/^[A-Za-z0-9.-]{3,100}$/.test(rh)?rh:"ntfy.envs.net";
-  const BASE=`https://${HOST}`;
-  let es=null, lastSent=0, lastReal=0, onSay=null, onX=null, onMove=null, queued=null, qTimer=null, state=null, errSince=0, lastId="", pollTimer=null;
-  const st={sent:0, sendFail:0, recv:0, dropped:0};
-  function pill(s){ state=s||state; const el=$("relaypill"); if(!el||!topic) return; el.style.display="inline-block";
-    el.className = state;
-    el.textContent = state==="on" ? "● 本物Bot実況 ON" : state==="err" ? "✕ 実況サーバーに接続できない" : "本物Bot実況 接続中…";
-    el.title = `中継: ${HOST} ／ 送信 ${st.sent}件（失敗 ${st.sendFail}・間引き ${st.dropped}） ／ 受信 ${st.recv}件`; }
-  function handle(d){
-    if(!d || d.event!=="message") return; if(d.id) lastId=d.id;
-    if(d.topic===`${topic}-mvr`){ try{ const j=JSON.parse(d.message); st.recv++; onMove && onMove(j); }catch(e){} return; }
-    if(d.topic===`${topic}-x`){ try{ const j=JSON.parse(d.message);
-      let text=String(j.text||"").replace(/https?:\/\/\S+/g,"").replace(/@\w+/g,"").replace(/[\u0000-\u001f]/g," ").trim().slice(0,40);
-      const id=String(j.id||d.id).replace(/[^\w-]/g,"").slice(0,40); if(text && id){ st.recv++; onX({id,text}); } }catch(e){} return; }
-    let who="Bot", text=d.message||"", sc=0, tg=null;
-    try{ const j=JSON.parse(d.message); who=j.who||who; text=j.text||""; sc=Math.floor(+j.superchat||0); tg=j.target||null; }catch(e){}
-    who=String(who).replace(/[\u0000-\u001f]/g,"").slice(0,20); text=String(text).replace(/[\u0000-\u001f]/g," ").trim().slice(0,60);
-    if(!text) return; st.recv++; lastReal=Date.now(); pill("on"); onSay(who,text,sc>0?Math.min(10000,Math.max(100,sc)):0,tg);
-  }
-  const topics=()=>`${topic}-say,${topic}-x,${topic}-mvr`;
-  function connect(){
-    try{ es && es.close(); }catch(e){}
-    es=new EventSource(`${BASE}/${topics()}/sse${lastId?`?since=${lastId}`:""}`);
-    es.onopen=()=>{ errSince=0; stopPoll(); pill("on"); };
-    es.onerror=()=>{ if(!errSince) errSince=Date.now();
-      setTimeout(()=>{ if(errSince && Date.now()-errSince>=3500) pill("err"); },4000);
-      if(es.readyState===2) setTimeout(connect,5000);           /* 閉じたら5秒後に再接続 */
-      if(Date.now()-errSince>15000) startPoll(); };             /* SSEがダメなら低頻度ポーリング */
-    es.onmessage=(m)=>{ try{ handle(JSON.parse(m.data)); }catch(e){} };
-  }
-  async function pollOnce(){
-    try{ const r=await fetch(`${BASE}/${topics()}/json?poll=1&since=${lastId||"30s"}`,{cache:"no-store"}); if(!r.ok) throw 0;
-      const t=await r.text(); pill("on");
-      t.split("\n").filter(Boolean).forEach(l=>{ try{ handle(JSON.parse(l)); }catch(e){} });
-    }catch(e){ pill("err"); }
-  }
-  function startPoll(){ if(pollTimer) return; pollOnce(); pollTimer=setInterval(pollOnce,8000); }  /* 8秒ごと（envs.netの制限内） */
-  function stopPoll(){ if(pollTimer){ clearInterval(pollTimer); pollTimer=null; } }
-  function init(chatFn, xFn, moveFn){ if(!topic) return; onSay=chatFn; onX=xFn; onMove=moveFn; pill("wait"); connect(); }
-  /* 観戦Bot向けイベント：5秒に1件まで。間に合わない分は「一番大事な最新の1件」を待たせて送る */
-  const PRI={end:9,game_start:9,special:5,corner:5,buzz:4,superchat:4,lead_change:3,big_flip:3,pass:3,progress:1};
-  function post(suffix, ev){ ev.ts=Date.now(); fetch(`${BASE}/${topic}-${suffix}`,{method:"POST",body:JSON.stringify(ev)})
-      .then(r=>{ if(r.ok) st.sent++; else st.sendFail++; pill(); }).catch(()=>{ st.sendFail++; pill(); }); }
-  function send(ev, force){
-    if(!topic) return; const now=Date.now();
-    if(force || now-lastSent>=5000){ if(ev.type==="end"){ queued=null; } lastSent=now; post("ev",ev); return; }
-    if(!queued || (PRI[ev.type]||1) >= (PRI[queued.type]||1)){ if(queued) st.dropped++; queued=ev; } else st.dropped++;
-    pill();
-    if(!qTimer) qTimer=setTimeout(()=>{ qTimer=null; const q=queued; queued=null; if(q){ lastSent=Date.now(); post("ev",q); } }, Math.max(50,lastSent+5000-now));
-  }
-  function publish(suffix, obj){ if(topic) post(suffix, obj); }   /* 対戦Bot向け（間引きなし） */
-  return { get on(){return !!topic;}, init, send, publish, realActive:()=>Date.now()-lastReal<60000, stats:st };
-})();
+/* 公開版では外部の実況中継へ接続しない */
+const RELAY = { on:false, init(){}, send(){}, publish(){}, realActive(){ return false; }, stats:{sent:0,sendFail:0,recv:0,dropped:0} };
 /* ===== 本物だけモード：?relay= のとき既定ON（?demo=1 で従来の演出つき） ===== */
 const REALONLY = RELAY.on && !Q.has("demo");
 const RS = { speakers:new Set(), live:0, sc:0, scYen:0, x:0 };   /* 配信全体の本物カウント */
@@ -958,7 +904,6 @@ function ingest(list){
 }
 async function poll(){
   if(REALONLY) return;   /* 本物だけモード：保存済み一覧は使わない */
-  if(location.protocol==="file:"){ ingest(SEED_COMMENTS); return; }
   try{ const r=await fetch(CONFIG.commentsUrl+"?t="+Date.now(),{cache:"no-store"}); if(!r.ok) throw 0; ingest(await r.json()); }
   catch(e){ ingest(SEED_COMMENTS); }
 }
